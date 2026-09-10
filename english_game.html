@@ -1135,6 +1135,39 @@
             cursor: pointer;
         }
 
+    
+        /* ==================== 学习实战成长与 GitHub 同步中心 ==================== */
+        .hub-btn-growth {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: 1px solid #a7f3d0;
+        }
+        .growth-modal-card {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            border: 2px solid #a7f3d0;
+            box-shadow: 0 4px 20px rgba(5, 150, 105, 0.1);
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .growth-log-preview {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.5;
+            max-height: 150px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: Consolas, monospace;
+        }
+
     </style>
 </head>
 <body>
@@ -1181,15 +1214,18 @@
                 ⚡ 四年级学神偷懒秘籍：如何用最小力气拿第一？(点击解锁)
             </button>
 
-            <div class="feynman-btn-hub">
+            <div class="feynman-btn-hub" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;">
                 <button class="hub-btn hub-btn-recall" onclick="openFreeRecallStudio()">
                     🎬 闭卷倒带回放
                 </button>
                 <button class="hub-btn hub-btn-feynman" onclick="openFeynmanStudio()">
-                    🎤 小老师费曼讲台
+                    🎤 小老师讲台
                 </button>
                 <button class="hub-btn hub-btn-memory" onclick="openMemoryCompass()">
                     🧠 记忆守护罗盘
+                </button>
+                <button class="hub-btn hub-btn-growth" onclick="openGrowthCenter()">
+                    🌱 成长与Git同步
                 </button>
             </div>
 
@@ -1555,6 +1591,305 @@ let feynmanRecordSeconds = 0;
 let feynmanLastAudioUrl = null;
 
 // 打开小老师讲台
+
+/* ==================== 学习实战成长档案与 GitHub API 自动化直推 ==================== */
+
+// 生成结构化 Markdown 成长报告
+function buildGrowthReportMarkdown(userNote) {
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    const timeStr = today.toLocaleTimeString();
+
+    const u = (typeof userData !== 'undefined' && userData) ? userData : { level: 1, exp: 0, coins: 0, completedUnits: [] };
+    
+    // 记忆库统计
+    const mKeys = Object.keys(memoryVault || {});
+    let permanentCount = 0;
+    let stage0Items = [];
+    mKeys.forEach(k => {
+        const item = memoryVault[k];
+        if (item.stage === 4) permanentCount++;
+        if (item.stage === 0 || item.mistakeCount > 0) {
+            stage0Items.push(item);
+        }
+    });
+
+    // 费曼记录与最新诊断
+    const fRecords = JSON.parse(localStorage.getItem('feynman_records') || '[]');
+    let lastDiag = null;
+    try {
+        const raw = localStorage.getItem('last_feynman_diagnosis');
+        if (raw) lastDiag = JSON.parse(raw);
+    } catch(e){}
+
+    let md = `# 📅 ${dateStr} 四年级语数英打怪实战与产品迭代档案\n\n`;
+    md += `> 自动生成时间：${dateStr} ${timeStr} · 来源：网页端成长系统直连\n\n`;
+    md += `## 👤 英雄成长画像\n`;
+    md += `- **当前等级**：Lv.${u.level || 1} 勇士 · **累计经验**：${u.exp || 0} EXP · **持有金币**：${u.coins || 0} 🪙\n`;
+    md += `- **艾宾浩斯记忆库**：已永久攻克 **${permanentCount}** 项知识点，历史记录总题量 **${mKeys.length}** 项。\n\n`;
+
+    md += `## 🎯 一、今日真实踩坑与遗忘卡点 (待攻坚弱项)\n`;
+    if (stage0Items.length === 0) {
+        md += `- 🌟 今日发挥优异，未产生跌入复仇池的顽固错题！\n`;
+    } else {
+        stage0Items.slice(0, 10).forEach((item, idx) => {
+            md += `${idx + 1}. **【${item.subject?.toUpperCase() || '学科'}】${item.title || item.key}**\n`;
+            md += `   - 累计做错次数：${item.mistakeCount || 1} 次\n`;
+            md += `   - 当前记忆阶段：第 ${item.stage || 0} 阶 (需重点强化)\n`;
+        });
+    }
+    md += `\n`;
+
+    md += `## 🎤 二、小老师费曼讲题实录与认知断点\n`;
+    if (lastDiag) {
+        md += `### 最新讲题攻坚：【${lastDiag.title}】\n`;
+        md += `- **核心算理模型**：${lastDiag.model}\n`;
+        md += `- **易错扣分陷阱**：${lastDiag.trap}\n`;
+        md += `- **孩子原声口述录音文稿**：\n  > "${lastDiag.speechText}"\n`;
+        md += `- **AI 评定结果**：${'⭐'.repeat(lastDiag.score || 2)} (${lastDiag.score === 3 ? '金牌小名师 (无可挑剔)' : '银牌小名师 (抓准核心，有跳步或漏陷阱)'})\n\n`;
+    } else if (fRecords.length > 0) {
+        md += `- 近期讲题记录：共完成 **${fRecords.length}** 次原声录制，最近一次讲解为《${fRecords[0].title}》(耗时 ${fRecords[0].duration || 0} 秒)。\n\n`;
+    } else {
+        md += `- 暂未开启小老师原声录制，建议孩子每日挑选 1 道错题进行口述讲题。\n\n`;
+    }
+
+    md += `## 💡 三、家长/学生即时体验反馈与迭代需求\n`;
+    if (userNote && userNote.trim()) {
+        md += `- **用户即时吐槽/建议**：\n  > "${userNote.trim()}"\n`;
+    } else {
+        md += `- 暂无额外手动吐槽，以客观错题与做题数据为准。\n`;
+    }
+    md += `\n---\n*本档案由【四年级语数英打怪战】自动沉淀，用于 Antigravity 自动化代码迭代与 NotebookLM 长期学习溯源。*\n`;
+
+    return md;
+}
+
+// 辅助转义 HTML
+function escapeHtmlForPreview(str) {
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// 打开学习成长与 Git 同步中心
+function openGrowthCenter() {
+    const token = (localStorage.getItem('github_sync_token') || '').trim();
+    const previewMd = buildGrowthReportMarkdown('');
+
+    showModal(`
+        <div class="growth-modal-card">
+            <div style="font-size:18px;font-weight:900;color:#065f46;display:flex;align-items:center;justify-content:space-between;">
+                <span>🌱 学习实战成长与迭代中心</span>
+                <span style="font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;background:${token ? '#dcfce7;color:#15803d;' : '#fef3c7;color:#b45309;'}">
+                    ${token ? '🔗 Git已绑定' : '⚠️ Git未绑定'}
+                </span>
+            </div>
+            <div style="font-size:11px;color:#64748b;margin:4px 0 10px;text-align:left;">
+                《认知天性》：<strong>真实数据驱动迭代！</strong> 一键直推战报到 Git 仓库，供 Antigravity 自动扩充变式题与排版优化。
+            </div>
+
+            <!-- 即时吐槽 / 体验许愿池 -->
+            <div style="background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:10px;padding:10px;margin-bottom:10px;text-align:left;">
+                <div style="font-size:11px;font-weight:800;color:#166534;margin-bottom:4px;">
+                    📝 今日学习体感 / 迭代许愿池 (选填，写几个字就行)：
+                </div>
+                <input type="text" id="growth-user-note" placeholder="如：乘法第3题字有点多 / 想多做几道结合律..." style="width:100%;border:1px solid #86efac;border-radius:6px;padding:6px 8px;font-size:12px;box-sizing:border-box;">
+            </div>
+
+            <!-- 战报预览区域 -->
+            <div style="text-align:left;margin-bottom:10px;">
+                <div style="font-size:11px;font-weight:800;color:#475569;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center;">
+                    <span>📋 今日实战档案预览 (系统全自动挖掘)：</span>
+                    <button style="background:none;border:none;color:#059669;font-size:11px;font-weight:800;cursor:pointer;text-decoration:underline;" onclick="openGitHubConfigModal()">
+                        ⚙️ ${token ? '修改Token' : '配置Git直推'}
+                    </button>
+                </div>
+                <div class="growth-log-preview" id="growth-preview-box">${escapeHtmlForPreview(previewMd)}</div>
+            </div>
+
+            <!-- 直推与复制状态条 -->
+            <div id="git-sync-status" style="display:none;background:#f8fafc;border:1px solid #cbd5e1;border-radius:8px;padding:8px;font-size:12px;margin-bottom:10px;text-align:left;line-height:1.5;"></div>
+
+            <!-- 三大核心操作栏 -->
+            <div style="display:flex;flex-direction:column;gap:6px;">
+                <button class="btn-large" style="background:linear-gradient(135deg,#059669,#10b981);color:#fff;font-size:13px;font-weight:900;box-shadow:0 3px 12px rgba(5,150,105,0.25);" onclick="syncReportToGitHub()">
+                    🚀 一键直推到 GitHub 仓库 (logs 目录)
+                </button>
+                <div style="display:flex;gap:6px;">
+                    <button class="btn-large" style="flex:1;background:#f8fafc;color:#0f172a;border:1px solid #cbd5e1;font-size:12px;font-weight:800;" onclick="copyGrowthReport()">
+                        📋 一键复制战报
+                    </button>
+                    <button class="btn-large" style="flex:1;background:#f8fafc;color:#0f172a;border:1px solid #cbd5e1;font-size:12px;font-weight:800;" onclick="downloadGrowthReport()">
+                        📥 导出 .md 文件
+                    </button>
+                </div>
+                <button class="btn-large" style="background:#f1f5f9;color:#64748b;font-size:12px;padding:6px;" onclick="closeModal()">
+                    关闭
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+// 直推战报到 GitHub 仓库
+async function syncReportToGitHub() {
+    const token = (localStorage.getItem('github_sync_token') || '').trim();
+    if (!token) {
+        return openGitHubConfigModal('请先填入您的 GitHub Token，即可开启一键直推！');
+    }
+
+    const statusEl = document.getElementById('git-sync-status');
+    if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.innerHTML = '⏳ 正在连接 GitHub API，准备写入仓库 logs/ 目录...';
+        statusEl.style.color = '#0284c7';
+    }
+
+    const note = (document.getElementById('growth-user-note')?.value || '').trim();
+    const mdContent = buildGrowthReportMarkdown(note);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const fileName = `${todayStr}_学习实战与迭代档案.md`;
+    const filePath = `logs/${fileName}`;
+    const apiUrl = `https://api.github.com/repos/letian366/english-game/contents/${encodeURIComponent(filePath)}`;
+
+    try {
+        // 1. 检查今日文件是否存在 (获取 sha 以防覆盖报错 422)
+        let existingSha = null;
+        try {
+            const checkResp = await fetch(apiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/vnd.github.v3+json'
+                }
+            });
+            if (checkResp.ok) {
+                const checkData = await checkResp.json();
+                existingSha = checkData.sha;
+            }
+        } catch(e){}
+
+        // 2. Base64 编码 (兼容中文 UTF-8)
+        const base64Content = btoa(unescape(encodeURIComponent(mdContent)));
+
+        // 3. 提交 PUT 请求直接写入
+        const putResp = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `chore: sync learning practice log for ${todayStr}`,
+                content: base64Content,
+                sha: existingSha || undefined
+            })
+        });
+
+        if (putResp.ok) {
+            const resData = await putResp.json();
+            if (statusEl) {
+                statusEl.innerHTML = `🎉 <strong>成功推送到 Git 仓库！</strong><br><a href="${resData.content?.html_url || 'https://github.com/letian366/english-game/tree/main/logs'}" target="_blank" style="color:#2563eb;text-decoration:underline;">👉 点击在 GitHub 查看文件：${filePath}</a>`;
+                statusEl.style.color = '#15803d';
+            }
+        } else {
+            const errData = await putResp.json();
+            if (statusEl) {
+                statusEl.innerHTML = `⚠️ 推送未成功 (${putResp.status})：${errData.message || 'Token 权限不足或网络受限'}。<br><small>请确保 Token 勾选了 <code>repo</code> 或 <code>contents:write</code> 权限。</small>`;
+                statusEl.style.color = '#b91c1c';
+            }
+        }
+    } catch (err) {
+        if (statusEl) {
+            statusEl.innerHTML = `⚠️ 网络请求失败：${err.message}。可使用下方【📋 一键复制】或【📥 导出文件】保底！`;
+            statusEl.style.color = '#b91c1c';
+        }
+    }
+}
+
+// 复制 Markdown 战报
+function copyGrowthReport() {
+    const note = (document.getElementById('growth-user-note')?.value || '').trim();
+    const md = buildGrowthReportMarkdown(note);
+    navigator.clipboard.writeText(md).then(() => {
+        alert('🎉 今日实战战报已复制到剪贴板！\n\n您可以：\n1. 直接粘贴进 NotebookLM 作为新来源；\n2. 直接发给 Antigravity，说一句“根据今天战报迭代题库”即可自动升级代码！');
+    }).catch(() => {
+        alert('复制受限，请手动长按预览框复制内容。');
+    });
+}
+
+// 导出为 .md 文件下载
+function downloadGrowthReport() {
+    const note = (document.getElementById('growth-user-note')?.value || '').trim();
+    const md = buildGrowthReportMarkdown(note);
+    const todayStr = new Date().toISOString().split('T')[0];
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${todayStr}_学习实战与迭代档案.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// 打开 GitHub Token 配置弹窗
+function openGitHubConfigModal(tip) {
+    const curToken = localStorage.getItem('github_sync_token') || '';
+    showModal(`
+        <div style="text-align:left;max-height:85vh;overflow-y:auto;padding:4px;">
+            <div style="font-size:16px;font-weight:900;color:#0f172a;display:flex;align-items:center;gap:6px;">
+                ⚙️ GitHub 自动同步配置
+            </div>
+            <div style="font-size:12px;color:#64748b;margin:6px 0 12px;line-height:1.5;">
+                ${tip || '配置一次 Personal Access Token (PAT)，以后手机/平板学完点一下就能直推到仓库 logs/ 目录！'}
+            </div>
+
+            <div style="background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;padding:10px;margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:800;color:#475569;margin-bottom:4px;">🔑 GitHub Personal Access Token：</div>
+                <input type="password" id="input-github-token" value="${curToken}" placeholder="ghp_xxxx 或 github_pat_xxxx" style="width:100%;padding:8px 10px;border:1.5px solid #94a3b8;border-radius:8px;font-size:13px;box-sizing:border-box;">
+                <div style="font-size:10px;color:#64748b;margin-top:4px;">
+                    🔒 安全承诺：Token <strong>仅保存在您当前设备的浏览器本地 (localStorage)</strong>，绝不会上传或写进任何公开代码。
+                </div>
+            </div>
+
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px;font-size:11px;color:#166534;line-height:1.6;margin-bottom:14px;">
+                <strong>💡 30 秒获取 Token 极简指引：</strong><br>
+                1. 打开 GitHub 网页 → 点右上角头像 → <strong>Settings</strong><br>
+                2. 最左侧滚到底部 → <strong>Developer Settings</strong><br>
+                3. 点击 <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong> → Generate new token<br>
+                4. 勾选 <strong>repo</strong> 权限 (具有写文件能力)<br>
+                5. 复制生成的以 <code>ghp_</code> 开头的密钥，粘贴到上方输入框保存即可！
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button class="btn-large" style="flex:1;background:#e2e8f0;color:#334155;" onclick="closeModal(); openGrowthCenter();">返回</button>
+                ${curToken ? '<button class="btn-large" style="background:#fee2e2;color:#991b1b;border:1px solid #f87171;" onclick="clearGitHubToken()">清除Token</button>' : ''}
+                <button class="btn-large" style="flex:2;background:linear-gradient(135deg,#059669,#10b981);color:#fff;" onclick="saveGitHubToken()">
+                    💾 保存配置
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+function saveGitHubToken() {
+    const val = (document.getElementById('input-github-token')?.value || '').trim();
+    if (!val) {
+        return alert('请输入有效 Token，或者点击返回。');
+    }
+    localStorage.setItem('github_sync_token', val);
+    alert('✅ GitHub Token 已安全保存在本地！现在可以一键直推战报到 Git 仓库了！');
+    closeModal();
+    openGrowthCenter();
+}
+
+function clearGitHubToken() {
+    localStorage.removeItem('github_sync_token');
+    alert('已清除本地保存的 GitHub Token。');
+    closeModal();
+    openGrowthCenter();
+}
+
 function openFeynmanStudio(presetTitle, presetQuestion, presetHint) {
     const hasCur = (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]);
     const defaultTitle = presetTitle || (hasCur ? (currentQueue[currentIndex].title || currentQueue[currentIndex].meaning || currentQueue[currentIndex].word) : '学校今日数学/英语错题');
@@ -1829,6 +2164,19 @@ async function runSpeechDiagnosis() {
 4. 🏅【小名师打分】：给出星级评定与鼓励寄语。`;
 
     window._lastDeepSeekPrompt = deepSeekPrompt;
+
+    // 沉淀最新讲题诊断供成长中心自动入库
+    try {
+        localStorage.setItem('last_feynman_diagnosis', JSON.stringify({
+            title: title,
+            question: question,
+            model: model,
+            trap: trap,
+            speechText: speechText,
+            score: score,
+            time: new Date().toLocaleString()
+        }));
+    } catch(e){}
 
     // 渲染诊断卡片
     const container = document.getElementById('feynman-diag-container');
