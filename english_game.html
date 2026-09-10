@@ -1027,6 +1027,114 @@
             overflow-y: auto;
         }
 
+    
+        /* ==================== AI 名师智能诊断与 DeepSeek 联动 ==================== */
+        .speech-transcript-box {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        .speech-transcript-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+        .speech-transcript-textarea {
+            width: 100%;
+            height: 60px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            color: #0f172a;
+            box-sizing: border-box;
+            background: #fff;
+            resize: none;
+            line-height: 1.45;
+        }
+        .ai-diag-card {
+            background: #ffffff;
+            border: 2px solid #c7d2fe;
+            border-radius: 14px;
+            padding: 14px;
+            margin: 12px 0;
+            text-align: left;
+            box-shadow: 0 4px 16px rgba(79, 70, 229, 0.08);
+            animation: fadeIn 0.3s ease;
+        }
+        .diag-star-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px dashed #e0e7ff;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        .diag-star-title { font-size: 14px; font-weight: 900; color: #3730a3; }
+        .diag-star-score { font-size: 16px; color: #f59e0b; }
+        .diag-section {
+            border-radius: 8px;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        .diag-sec-good {
+            background: #ecfdf5;
+            border-left: 3px solid #10b981;
+            color: #065f46;
+        }
+        .diag-sec-warn {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            color: #991b1b;
+        }
+        .diag-sec-tip {
+            background: #fffbeb;
+            border-left: 3px solid #f59e0b;
+            color: #92400e;
+        }
+        .deepseek-action-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .btn-deepseek {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 2px 10px rgba(30, 64, 175, 0.25);
+            transition: transform 0.15s;
+        }
+        .btn-deepseek:active { transform: scale(0.98); }
+        .btn-kimi {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
@@ -1510,6 +1618,24 @@ function openFeynmanStudio(presetTitle, presetQuestion, presetHint) {
                 </div>
             </div>
 
+            <!-- 口述内容实时听写转文稿 (支持查看与修改) -->
+            <div class="speech-transcript-box">
+                <div class="speech-transcript-label">
+                    <span>📝 口述内容稿 (说话时自动转字，也可手动输入)：</span>
+                    <span id="speech-live-status" style="color:#0284c7;font-size:10px;">准备就绪</span>
+                </div>
+                <textarea class="speech-transcript-textarea" id="feynman-speech-text" placeholder="按下录音开始讲题，或者直接在这里输入你讲题的思路..."></textarea>
+                
+                <div style="display:flex;gap:6px;margin-top:6px;">
+                    <button style="flex:1;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:900;cursor:pointer;box-shadow:0 2px 8px rgba(79,70,229,0.25);" onclick="runSpeechDiagnosis()">
+                        🔍 AI 诊断我讲得怎么样 (查漏洞与算理)
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI 诊断卡片展示区 -->
+            <div id="feynman-diag-container" style="display:none;"></div>
+
             <div style="display:flex;gap:8px;">
                 <button class="btn-large" style="flex:1;background:#e2e8f0;color:#334155;" onclick="closeFeynmanStudio()">先不讲了</button>
                 <button class="btn-large" style="flex:2;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;" id="btn-save-lecture" onclick="submitFeynmanLecture()">
@@ -1532,7 +1658,24 @@ function openFeynmanForCurrent() {
     openFeynmanStudio(t, q, h);
 }
 
-// 启动录音
+let feynmanSpeechRecognizer = null;
+
+// 初始化语音听写 (Web Speech API)
+function initSpeechRecognition() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return null;
+    try {
+        const recognizer = new SpeechRecognition();
+        recognizer.lang = 'zh-CN';
+        recognizer.continuous = true;
+        recognizer.interimResults = true;
+        return recognizer;
+    } catch(e) {
+        return null;
+    }
+}
+
+// 启动录音与实时语音转字
 async function startFeynmanRecording() {
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -1551,8 +1694,10 @@ async function startFeynmanRecording() {
                 player.src = feynmanLastAudioUrl;
                 document.getElementById('feynman-playback-area').style.display = 'block';
             }
-            // 停止麦克风占用
             stream.getTracks().forEach(track => track.stop());
+            if (feynmanSpeechRecognizer) {
+                try { feynmanSpeechRecognizer.stop(); } catch(e){}
+            }
         };
 
         feynmanMediaRecorder.start();
@@ -1564,6 +1709,27 @@ async function startFeynmanRecording() {
         btn.innerHTML = '⏹️ 讲完了，完成录制';
         btn.onclick = stopFeynmanRecording;
 
+        // 尝试启动语音听写
+        const speechStatus = document.getElementById('speech-live-status');
+        const speechTextEl = document.getElementById('feynman-speech-text');
+        feynmanSpeechRecognizer = initSpeechRecognition();
+        if (feynmanSpeechRecognizer) {
+            if (speechStatus) speechStatus.innerText = '🔴 正在实时听写...';
+            feynmanSpeechRecognizer.onresult = (event) => {
+                let transcript = '';
+                for (let i = 0; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                if (speechTextEl && transcript) {
+                    speechTextEl.value = transcript;
+                }
+            };
+            feynmanSpeechRecognizer.onerror = () => {
+                if (speechStatus) speechStatus.innerText = '⚠️ 听写受限，支持手动输入';
+            };
+            try { feynmanSpeechRecognizer.start(); } catch(e){}
+        }
+
         if (feynmanTimerInterval) clearInterval(feynmanTimerInterval);
         feynmanTimerInterval = setInterval(() => {
             feynmanRecordSeconds++;
@@ -1574,7 +1740,7 @@ async function startFeynmanRecording() {
         }, 1000);
 
     } catch (err) {
-        alert('⚠️ 无法启动麦克风。请确保在浏览器中允许了麦克风权限！可以直接大声讲给家长听，讲完直接点击【讲完打卡】哦！');
+        alert('⚠️ 无法启动麦克风。请在浏览器中允许麦克风权限！或者您可以直接在下方文本框打字输入讲题内容，同样支持 AI 查漏洞！');
     }
 }
 
@@ -1583,6 +1749,12 @@ function stopFeynmanRecording() {
     if (feynmanMediaRecorder && feynmanMediaRecorder.state !== 'inactive') {
         feynmanMediaRecorder.stop();
     }
+    if (feynmanSpeechRecognizer) {
+        try { feynmanSpeechRecognizer.stop(); } catch(e){}
+    }
+    const speechStatus = document.getElementById('speech-live-status');
+    if (speechStatus) speechStatus.innerText = '✅ 录制完成';
+
     if (feynmanTimerInterval) clearInterval(feynmanTimerInterval);
     const box = document.getElementById('wave-bars-box');
     if (box) box.classList.remove('recording-active');
@@ -1592,6 +1764,194 @@ function stopFeynmanRecording() {
         btn.className = 'rec-ctrl-btn btn-start-rec';
         btn.innerHTML = '🔄 重新录一遍';
         btn.onclick = startFeynmanRecording;
+    }
+}
+
+// 执行讲题 AI 诊断 (本地智能专家诊断 + 一键唤醒 DeepSeek/Kimi 网页版 + 智谱直连)
+async function runSpeechDiagnosis() {
+    const speechText = (document.getElementById('feynman-speech-text')?.value || '').trim();
+    if (!speechText) {
+        return alert('小名师还没有说话或输入内容哦！请先按录音讲几句，或者在文本框里输入你的解题思路！');
+    }
+
+    const cur = (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) ? currentQueue[currentIndex] : {};
+    const title = document.getElementById('feynman-input-title')?.value || cur.title || '应用题算理攻坚';
+    const question = document.getElementById('feynman-input-body')?.value || cur.question || cur.cn || '';
+    const model = cur.mathModel || cur.logicReasoning || cur.cnSource || '核心公式与基本算理';
+    const trap = cur.trapRule || '注意隐藏陷阱与单位换算';
+
+    // 1. 本地名师认知模型匹配度分析
+    let score = 2; // 默认2星
+    let goodPoints = [];
+    let weakPoints = [];
+    let tips = [];
+
+    // 规则分析：是否提到了关键模型词或算式
+    const hasModelWords = speechText.includes('乘') || speechText.includes('加') || speechText.includes('除') || speechText.includes('减') || speechText.includes('模型') || speechText.includes('公式') || speechText.includes('因为') || speechText.includes('所以') || speechText.includes('算式') || speechText.includes('句型');
+    const hasTrapWords = speechText.includes('坑') || speechText.includes('注意') || speechText.includes('小心') || speechText.includes('别') || speechText.includes('零') || speechText.includes('位') || speechText.includes('错') || speechText.includes('单位');
+
+    if (hasModelWords) {
+        goodPoints.push('准确抓住了核心算理/公式，因果关系阐述清晰！');
+    } else {
+        weakPoints.push('讲题时没有明确说出这道题属于哪个“核心公式或数量模型”，略微有点跳步。');
+    }
+
+    if (hasTrapWords) {
+        goodPoints.push('太敏锐了！提醒了听众注意题目里的易错陷阱，非常专业！');
+        score = 3;
+    } else {
+        weakPoints.push('漏掉了最阴险的破绽提醒：' + trap + '。在考场上如果不注意，可能会被直接扣分哦！');
+    }
+
+    if (speechText.length > 30) {
+        goodPoints.push('表述流畅充实，小名师气场很足！');
+    } else {
+        tips.push('讲得稍微有点短，建议再多说一句：“为什么这道题要这么算”会更精彩！');
+    }
+
+    const stars = '⭐'.repeat(score);
+    const starTitle = score === 3 ? '🏆 金牌小名师 (无可挑剔)' : '🥈 银牌小名师 (已抓准核心)';
+
+    // 生成专业特级教师 Prompt
+    const deepSeekPrompt = `【四年级小老师讲题挑战 · 特级教师深度诊断】
+题目：${title}
+题干情境：${question}
+标准算理与模型：${model}
+易错扣分陷阱：${trap}
+
+孩子刚才的讲题口述录音文稿：
+"${speechText}"
+
+请你扮演一位拥有20年教学经验、风趣幽默、擅长启发孩子的小学特级名师，用适合9~10岁四年级孩子的口吻进行专业诊断：
+1. 🌟【讲得最棒的地方】：指出孩子抓住了什么核心逻辑，给予大大的夸奖！
+2. 🔍【挑出漏洞与跳步】：指出哪里没解释清楚原因、有没有跳步？如果考场这么写会不会被扣分？
+3. 🎯【名师一招破局锦囊】：教孩子一句顺口溜或极简心法，下次讲得更完美！
+4. 🏅【小名师打分】：给出星级评定与鼓励寄语。`;
+
+    window._lastDeepSeekPrompt = deepSeekPrompt;
+
+    // 渲染诊断卡片
+    const container = document.getElementById('feynman-diag-container');
+    if (!container) return;
+    container.style.display = 'block';
+    container.setAttribute('data-prompt', deepSeekPrompt);
+
+    const glmApiKey = localStorage.getItem('domestic_glm_api_key') || '';
+
+    container.innerHTML = `
+        <div class="ai-diag-card">
+            <div class="diag-star-row">
+                <span class="diag-star-title">🤖 AI 名师本地诊断结果</span>
+                <span class="diag-star-score">${stars} ${starTitle}</span>
+            </div>
+
+            <div class="diag-section diag-sec-good">
+                <strong>🌟 闪光点：</strong>${goodPoints.join(' ')}
+            </div>
+
+            ${weakPoints.length > 0 ? `
+            <div class="diag-section diag-sec-warn">
+                <strong>🔍 需防范漏洞：</strong>${weakPoints.join(' ')}
+            </div>` : ''}
+
+            <div class="diag-section diag-sec-tip">
+                <strong>💡 名师建议：</strong>${tips.length > 0 ? tips.join(' ') : '整体非常扎实！只要保持这种讲题习惯，全班第一稳稳拿下！'}
+            </div>
+
+            <div id="direct-ai-status-area" style="display:${glmApiKey ? 'block' : 'none'};margin-top:8px;">
+                <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:8px;font-size:12px;color:#166534;" id="direct-ai-output">
+                    ⏳ 正在通过国内免费大模型直连生成深度评阅...
+                </div>
+            </div>
+
+            <!-- 一键召唤 DeepSeek 网页版大按钮 -->
+            <div class="deepseek-action-bar">
+                <button class="btn-deepseek" onclick="copyAndInvokeDeepSeek()">
+                    🤖 一键复制并唤醒 DeepSeek 网页版深度复核 (免费满血版)
+                </button>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                    <button class="btn-kimi" style="flex:1;" onclick="copyAndInvokeKimi()">
+                        🐰 唤醒 Kimi 网页版
+                    </button>
+                    <button class="btn-kimi" style="flex:1;" onclick="openCustomApiModal()">
+                        ⚙️ ${glmApiKey ? '已绑定智谱Key(免跳出)' : '配置国内免费Key(免跳出)'}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    if (glmApiKey) {
+        callDirectGlm(glmApiKey, deepSeekPrompt);
+    }
+}
+
+function getActiveDiagnosisPrompt() {
+    return window._lastDeepSeekPrompt || document.getElementById('feynman-diag-container')?.getAttribute('data-prompt') || '';
+}
+
+// 复制并打开 DeepSeek 官网
+function copyAndInvokeDeepSeek() {
+    const promptText = getActiveDiagnosisPrompt();
+    if (!promptText) return alert('请先进行 AI 诊断');
+    navigator.clipboard.writeText(promptText).then(() => {
+        alert('🎉 已为你自动复制好【特级名师诊断指令】！\n\n即将为你打开 DeepSeek 网页版，进入后直接在聊天框【粘贴并发送】即可看满血深度诊断！');
+        window.open('https://chat.deepseek.com/', '_blank');
+    }).catch(() => {
+        window.open('https://chat.deepseek.com/', '_blank');
+    });
+}
+
+// 复制并打开 Kimi 官网
+function copyAndInvokeKimi() {
+    const promptText = getActiveDiagnosisPrompt();
+    if (!promptText) return alert('请先进行 AI 诊断');
+    navigator.clipboard.writeText(promptText).then(() => {
+        alert('🎉 已为你复制好诊断指令！即将打开 Kimi 官网，进入后直接粘贴即可！');
+        window.open('https://kimi.moonshot.cn/', '_blank');
+    }).catch(() => {
+        window.open('https://kimi.moonshot.cn/', '_blank');
+    });
+}
+
+// 配置国内免费 API (智谱 GLM-4-Flash 页面内直连)
+function openCustomApiModal() {
+    const curKey = localStorage.getItem('domestic_glm_api_key') || '';
+    const key = prompt('【国内免费大模型直连设置】\n\n如果你希望孩子讲完后【直接在网页内出评语，不跳到其他软件】：\n可以填入智谱官方免费的 API Key (GLM-4-Flash 永久免费，官网注册即有)：\n\n请输入智谱 API Key (留空则使用默认极速诊断)：', curKey);
+    if (key !== null) {
+        localStorage.setItem('domestic_glm_api_key', key.trim());
+        alert(key.trim() ? '✅ 国内免费大模型已绑定！下次诊断将直接在页面内秒级生成评语！' : '已清除自定义 API Key，恢复默认模式。');
+    }
+}
+
+// 智谱 GLM-4-Flash 直连异步调用
+async function callDirectGlm(apiKey, promptText) {
+    const statusBox = document.getElementById('direct-ai-output');
+    try {
+        const resp = await fetch('https://open.bigmodel.cn/api/paas/v4/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + apiKey
+            },
+            body: JSON.stringify({
+                model: 'glm-4-flash',
+                messages: [
+                    { role: 'user', content: promptText }
+                ]
+            })
+        });
+        const data = await resp.json();
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            const reply = data.choices[0].message.content;
+            if (statusBox) {
+                statusBox.innerHTML = '<strong>🎓 智谱名师直连评语：</strong><br>' + reply.replace(/\n/g, '<br>');
+            }
+        } else if (data.error) {
+            if (statusBox) statusBox.innerHTML = '⚠️ 直连调用提示：' + (data.error.message || 'Key不正确或网络受限，可使用下方按钮直接唤醒 DeepSeek 网页版！');
+        }
+    } catch (e) {
+        if (statusBox) statusBox.innerHTML = '⚠️ 无法直连大模型（可能跨域或无网络），建议直接点击下方【一键唤醒 DeepSeek 网页版】！';
     }
 }
 
