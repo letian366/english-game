@@ -908,6 +908,125 @@
         }
         .curve-col.active-today .curve-count { color: #dc2626; }
 
+    
+        /* ==================== 学神偷懒秘籍、闭卷回忆与章节大统领 ==================== */
+        .cheatsheet-banner-btn {
+            width: 100%;
+            background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6);
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: 900;
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 2px solid #fbcfe8;
+            box-shadow: 0 4px 14px rgba(236, 72, 153, 0.25);
+            margin: 8px 0 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .cheatsheet-banner-btn:active {
+            transform: scale(0.98);
+        }
+        .hub-btn-recall {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #fff;
+            border: 1px solid #a7f3d0;
+        }
+
+        /* 偷懒秘籍卡片 */
+        .lazy-card {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1.5px solid #e2e8f0;
+            padding: 14px;
+            margin-bottom: 12px;
+            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            position: relative;
+        }
+        .lazy-badge {
+            display: inline-block;
+            background: #fef3c7;
+            color: #b45309;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+        }
+        .lazy-title {
+            font-size: 15px;
+            font-weight: 900;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+        .lazy-comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: #f8fafc;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.45;
+            margin: 6px 0;
+        }
+        .comp-bad { color: #dc2626; font-weight: 700; }
+        .comp-good { color: #16a34a; font-weight: 800; }
+        .lazy-science {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        /* 闭卷回忆脚手架 */
+        .recall-step-card {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .recall-q {
+            font-weight: 800;
+            color: #166534;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .recall-input {
+            width: 100%;
+            border: 1px solid #86efac;
+            border-radius: 8px;
+            padding: 6px 8px;
+            font-size: 12px;
+            box-sizing: border-box;
+            background: #fff;
+        }
+
+        /* 章节一张纸大统领骨架卡 */
+        .chapter-tree-box {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 14px;
+            padding: 14px;
+            text-align: left;
+            margin: 12px 0;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            color: #1e293b;
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -949,7 +1068,15 @@
     
         
             <!-- 认知科学两大超级引擎入口 (基于四本书理论：小老师费曼输出 + 艾宾浩斯记忆罗盘) -->
+            <!-- 首页置顶：学神偷懒秘籍 (适合四年级孩子的最小力气最大结果法) -->
+            <button class="cheatsheet-banner-btn" onclick="openLazyGeniusCheatsheet()">
+                ⚡ 四年级学神偷懒秘籍：如何用最小力气拿第一？(点击解锁)
+            </button>
+
             <div class="feynman-btn-hub">
+                <button class="hub-btn hub-btn-recall" onclick="openFreeRecallStudio()">
+                    🎬 闭卷倒带回放
+                </button>
                 <button class="hub-btn hub-btn-feynman" onclick="openFeynmanStudio()">
                     🎤 小老师费曼讲台
                 </button>
@@ -981,6 +1108,12 @@
             </div>
 
             <!-- 关卡网格 (动态渲染当前版本) -->
+            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 8px;">
+                <span style="font-size:13px;font-weight:900;color:#0f172a;">🗺️ 本学期通关关卡</span>
+                <button style="background:#f1f5f9;color:#0284c7;border:1px solid #bae6fd;border-radius:8px;padding:4px 10px;font-size:12px;font-weight:800;cursor:pointer;" onclick="openCurrentSubjectChapterMap()">
+                    🗺️ 一张纸讲透本章全景
+                </button>
+            </div>
             <div class="unit-grid" id="unit-selection-grid"></div>
         </div>
 
@@ -1503,6 +1636,243 @@ function submitFeynmanLecture() {
 function closeFeynmanStudio() {
     stopFeynmanRecording();
     closeModal();
+}
+
+
+/* ==================== 1. 四年级学神偷懒秘籍 (用最小力气拿最大结果) ==================== */
+function openLazyGeniusCheatsheet() {
+    showModal(`
+        <div style="text-align:left;">
+            <div style="font-size:18px;font-weight:900;color:#be185d;display:flex;align-items:center;gap:6px;">
+                ⚡ 四年级学神偷懒秘籍 · 极简拿分四大心法
+            </div>
+            <div style="font-size:11px;color:#64748b;margin:4px 0 12px;">
+                给9~10岁孩子的聪明人指南：<strong>拒绝死记硬背受苦，用认知杠杆撬动第一名！</strong>
+            </div>
+
+            <!-- 秘籍 1 -->
+            <div class="lazy-card">
+                <span class="lazy-badge">心法 1 · 省时 80%</span>
+                <div class="lazy-title">别抄 10 遍，只要合书倒带 3 分钟！</div>
+                <div class="lazy-comparison">
+                    <span class="comp-bad">❌ 笨蛋做法：把单词或课文抄10遍，手抄酸了脑子在睡觉，考场依然忘！</span>
+                    <span class="comp-good">✅ 学神偷懒：学完合上书，像看电影倒带一样在大脑里想一遍，一次顶抄10遍！</span>
+                </div>
+                <div class="lazy-science">
+                    🧠 《认知天性》：大脑越是费劲地从记忆中“拽出”信息，神经突触长得越粗！
+                </div>
+                <button style="margin-top:6px;background:#ecfdf5;color:#059669;border:1px solid #a7f3d0;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;" onclick="closeModal(); openFreeRecallStudio();">
+                    👉 立即去练【闭卷电影回放】
+                </button>
+            </div>
+
+            <!-- 秘籍 2 -->
+            <div class="lazy-card">
+                <span class="lazy-badge">心法 2 · 吸收率 90%</span>
+                <div class="lazy-title">别看懂了就算，抓个玩偶当徒弟！</div>
+                <div class="lazy-comparison">
+                    <span class="comp-bad">❌ 笨蛋做法：看答案“哦我知道了”，考场换个马甲立刻交白卷（熟练度假象）！</span>
+                    <span class="comp-good">✅ 学神偷懒：把这道题像小老师一样讲给玩偶或爸爸妈妈听，讲得通就是彻底真会！</span>
+                </div>
+                <div class="lazy-science">
+                    🧠 《学习观》：听讲吸收率只有5%，但<strong>“教会别人”的吸收率高达90%！</strong>
+                </div>
+                <button style="margin-top:6px;background:#fef3c7;color:#b45309;border:1px solid #fde047;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;" onclick="closeModal(); openFeynmanStudio();">
+                    👉 立即去练【小老师费曼讲台】
+                </button>
+            </div>
+
+            <!-- 秘籍 3 -->
+            <div class="lazy-card">
+                <span class="lazy-badge">心法 3 · 减负 10 倍</span>
+                <div class="lazy-title">别刷 50 道题，只吃透 1 个母模型！</div>
+                <div class="lazy-comparison">
+                    <span class="comp-bad">❌ 笨蛋做法：每天刷30道数学题，做一道忘一道，把自己累瘫！</span>
+                    <span class="comp-good">✅ 学神偷懒：四年级只有4个母模型（加法总量/相差，乘法总价/行程）。吃透母模型，全考场应用题通杀！</span>
+                </div>
+                <div class="lazy-science">
+                    🧠 《学习的本质》：大脑工作记忆极小，用结构化母模型释放大脑，才能轻松做难题！
+                </div>
+                <button style="margin-top:6px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:6px;padding:4px 8px;font-size:11px;font-weight:800;cursor:pointer;" onclick="closeModal(); openCurrentSubjectChapterMap();">
+                    👉 立即查看【单元一张纸母模型】
+                </button>
+            </div>
+
+            <!-- 秘籍 4 -->
+            <div class="lazy-card">
+                <span class="lazy-badge">心法 4 · 心理逆袭</span>
+                <div class="lazy-title">做错题等于爆出了史诗级黄金宝箱！</div>
+                <div class="lazy-comparison">
+                    <span class="comp-bad">❌ 笨蛋做法：做错题心情烦躁、撕本子逃避，错题成为考场扣分地雷！</span>
+                    <span class="comp-good">✅ 学神偷懒：做错题说明精准踩中了大脑盲区！消灭一道错题=消灭一个扣分点，今天消灭它，永远不再错！</span>
+                </div>
+                <div class="lazy-science">
+                    🧠 《让学习像游戏一样上瘾》：把错误重塑为升级经验包，每一次复仇都是暴击成长！
+                </div>
+            </div>
+
+            <button class="btn-large" onclick="closeModal()">收下四大秘籍，我去做聪明学神！</button>
+        </div>
+    `);
+}
+
+
+/* ==================== 2. 课后 3 分钟闭卷电影回放 (Free Recall) ==================== */
+function openFreeRecallStudio() {
+    const defaultTopic = (currentQueue && currentQueue[currentIndex]) ? (currentQueue[currentIndex].title || currentQueue[currentIndex].meaning || '今天学过的一节课') : '今天刚学完的单元或课程';
+    showModal(`
+        <div style="text-align:left;">
+            <div style="font-size:18px;font-weight:900;color:#059669;display:flex;align-items:center;gap:6px;">
+                🎬 课后 3 分钟闭卷电影回放
+            </div>
+            <div style="font-size:11px;color:#64748b;margin:4px 0 10px;">
+                合上书本，闭眼5秒钟像倒带电影一样思考，回答下面 3 个问题：
+            </div>
+
+            <div style="background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;color:#065f46;margin-bottom:10px;">
+                🎯 回放主题：${defaultTopic}
+            </div>
+
+            <!-- 三问闭卷脚手架 -->
+            <div class="recall-step-card">
+                <div class="recall-q">1. 🎬 今天的主角/核心新大招是谁？</div>
+                <input class="recall-input" id="recall-q1" placeholder="例如：认识了万以上数分级线 / 学会了总价=单价×数量模型...">
+            </div>
+
+            <div class="recall-step-card">
+                <div class="recall-q">2. ⚠️ 怪兽最容易在哪个坑里阴我？</div>
+                <input class="recall-input" id="recall-q2" placeholder="例如：乘法末尾有几个0最容易漏写 / 单词结尾是or别拼成er...">
+            </div>
+
+            <div class="recall-step-card">
+                <div class="recall-q">3. 🗡️ 一招制敌的杀手锏口诀是什么？</div>
+                <input class="recall-input" id="recall-q3" placeholder="例如：先分级再读写 / 看清是求差值还是求倍数...">
+            </div>
+
+            <!-- 口述录音或快速打卡 -->
+            <div style="background:#f8fafc;border:1px dashed #cbd5e1;border-radius:10px;padding:10px;margin:10px 0;text-align:center;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:6px;">不想打字？对着手机/平板口述 30 秒也可以：</div>
+                <button style="background:#059669;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;" onclick="closeModal(); openFeynmanStudio('闭卷回忆：' + '${defaultTopic}');">
+                    🎙️ 切换至麦克风口述回放
+                </button>
+            </div>
+
+            <button class="btn-large" style="background:linear-gradient(135deg,#10b981,#059669);color:#fff;" onclick="submitFreeRecall()">
+                🎉 完成闭卷倒带 (+40 EXP)
+            </button>
+        </div>
+    `);
+}
+
+function submitFreeRecall() {
+    addRewards(40, 15);
+    userData.coins += 10;
+    saveUserData();
+    updatePlayerBar();
+    closeModal();
+    showModal(`
+        <div style="text-align:center;padding:10px;">
+            <div style="font-size:42px;margin-bottom:6px;">🧠⭐</div>
+            <div style="font-size:19px;font-weight:900;color:#059669;">闭卷倒带完成！神经元已牢固锁死！</div>
+            <div style="font-size:12px;color:#475569;margin:8px 0 14px;line-height:1.5;">
+                你没有偷看书本，完全依靠自己的大脑提取出了核心线索！<br>
+                获得【⭐ 脑力电影大师】勋章认证！
+            </div>
+            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:8px;font-size:13px;font-weight:800;color:#166534;margin-bottom:14px;">
+                🎉 经验值 +40 EXP · 金币 +10 🪙
+            </div>
+            <button class="btn-large" onclick="closeModal()">太棒了，继续前进！</button>
+        </div>
+    `);
+}
+
+
+/* ==================== 3. 章节知识大统领 (一张纸讲透整章全景) ==================== */
+const CHAPTER_MINDMAPS = {
+    math: {
+        title: "🔢 四年级数学上册 · 一张纸核心母模型全景树",
+        tree: `【四年级上册数学一张纸知识树】
+├── ① 数与代数母模型：
+│   ├── 万以上数的认识：从个位起每4位一级(个级/万级/亿级)，读数时每级末尾零不读，中间连续零只读一个。
+│   └── 多位数乘两位数：笔算算理两步走(先乘个位再乘十位，末尾对齐)，因数末尾有几个零先算前面再全补齐。
+│
+├── ② 数量关系双核母模型 (应用题万能钥匙)：
+│   ├── 加法模型：
+│   │   ├── 总量模型：部分量A + 部分量B = 总量 (求合体)
+│   │   └── 相差模型：较小数 + 差量 = 较大数 (求比...多/少)
+│   └── 乘法模型：
+│       ├── 总价模型：单价 × 数量 = 总价 (求几份相同价格)
+│       └── 行程模型：速度 × 时间 = 路程 (相向相遇：速度和 × 相遇时间 = 总路程)
+│
+├── ③ 空间几何母模型：
+│   ├── 角的度量：射线旋转成角；锐角(<90°) < 直角(90°) < 钝角(90°~180°) < 平角(180°) < 周角(360°)
+│   └── 平行四边形与梯形：对边平行且相等(不稳定易变形)；只有一组对边平行为梯形；高必从顶点作垂线！
+│
+└── ④ 数据分析母模型：
+    └── 复式条形统计图：看图先看【图例】！单式看整体分布，复式抓对比差异，为决策提供事实依据。`
+    },
+    cn: {
+        title: "📖 四年级语文上册 · 8大单元一张纸素养全景",
+        tree: `【四年级上册语文一张纸核心图谱】
+├── 第一单元 · 自然奇观：《观潮》(由远及近白马并进)、《繁星》(由家乡到海上的宇宙依恋)。
+├── 第二单元 · 提问思考：《一个豆荚里的五粒豆》(学提问)、《方帽子店》(打破教条)、《田忌赛马》(2:1博弈反超)。
+├── 第三单元 · 细致观察：《古诗三首》(横看成岭侧成峰/雪梅相衬)、《爬山虎的脚》(连环动词记录变化)。
+├── 第四单元 · 神话世界：《盘古开天地》(化生万物奉献)、《精卫填海》(女娃常衔木石堙东海/不屈斗志)。
+├── 第五单元 · 清楚叙事：按事情发展顺序写清“起因、经过、结果”，把看到的听到的真实感受写具体。
+├── 第六单元 · 文化遗产：《长城》(崇山峻岭巨龙)、《颐和园》(移步换景)、《秦兵马俑》(神态各异壮美)。
+├── 第七单元 · 成长体验：《王戎不取道旁李》(树在道边而多子必苦李/善观察思辨)。
+└── 第八单元 · 家国情怀：《古诗三首》(出塞/夏日绝句)、《我将无我，不负人民》(大无畏担当)。`
+    },
+    en: {
+        title: "🔤 四年级英语上册 · 句型总脑图与交际母式",
+        tree: `【四年级英语一张纸句型总脑图】
+├── ① 英语句型两大宗族：
+│   ├── 状态型 (系表状)：主语 + be动词(am/is/are) + 状态形容词/名词 + 状语
+│   │   └── 例：My schoolbag is heavy. / The weather is sunny.
+│   └── 动作型 (主谓宾状)：主语 + 行为动词 + 宾语 + 状语
+│       └── 例：I clean my room every day. / She helps in the community.
+│
+├── ② 核心单元交际任务线：
+│   ├── Unit 1 帮做家务：What can you do to help at home? -> I can wash clothes.
+│   ├── Unit 2 我的朋友：What does your friend look like? -> He is tall and friendly.
+│   ├── Unit 3 居住社区：Where do you live? -> I live near a park.
+│   ├── Unit 4 天气与我们：What's the weather like today? -> It's cool and windy.
+│   └── Unit 5 四季更迭：What season do you like? -> I like autumn because of harvest.
+│
+└── ③ 自然拼读黄金口诀：
+    ├── 见元音抓音节，字母组合抱成团 (ch/sh/th/ee/ea/or/ar)
+    └── 听清辅音找位置，拼读如同拼积木！`
+    }
+};
+
+function openCurrentSubjectChapterMap() {
+    const mapData = CHAPTER_MINDMAPS[curSubject] || CHAPTER_MINDMAPS['math'];
+    showModal(`
+        <div style="text-align:left;">
+            <div style="font-size:18px;font-weight:900;color:#1e3a8a;display:flex;align-items:center;gap:6px;">
+                🗺️ ${mapData.title}
+            </div>
+            <div style="font-size:11px;color:#64748b;margin:4px 0 10px;">
+                《学习观》：<strong>脑子里有树，做题才不慌！</strong> 掌握这一张纸，全学期题型尽在掌控中！
+            </div>
+
+            <!-- 知识树呈现 -->
+            <div class="chapter-tree-box">${mapData.tree}</div>
+
+            <!-- 小名师讲整章挑战 -->
+            <div style="background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px;margin-bottom:12px;">
+                <div style="font-size:12px;font-weight:800;color:#1d4ed8;margin-bottom:4px;">🎤 小名师全景串讲挑战 (+60 EXP)：</div>
+                <div style="font-size:11px;color:#334155;line-height:1.4;margin-bottom:8px;">
+                    能看着这张图把这一章给爸爸妈妈讲明白，考场上遇到任何压轴题都能一眼看穿本质！
+                </div>
+                <button style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:800;cursor:pointer;" onclick="closeModal(); openFeynmanStudio('全景串讲：' + curSubject); ">
+                    🎙️ 开启全章名师串讲录音
+                </button>
+            </div>
+
+            <button class="btn-large" onclick="closeModal()">看懂全景了，回关卡斩怪！</button>
+        </div>
+    `);
 }
 
 /* ==================== 1. 本地存储、换装与用户成长系统 ==================== */
