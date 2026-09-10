@@ -1133,6 +1133,36 @@
 
 <script>
 
+// ==================== 全局通用基础与弹窗引擎 ====================
+currentQueue = [];
+currentIndex = 0;
+curSubject = 'en';
+curMode = 'words';
+curVersion = 'new';
+currentMistakesThisRound = [];
+bossHp = 100;
+bossMaxHp = 100;
+
+function openModal(html) {
+    const el = document.getElementById('modal-body-content');
+    const mask = document.getElementById('game-modal');
+    if (el && mask) {
+        el.innerHTML = html;
+        mask.style.display = 'flex';
+    }
+}
+function showModal(html) {
+    openModal(html);
+}
+function closeModal() {
+    const mask = document.getElementById('game-modal');
+    if (mask) mask.style.display = 'none';
+}
+function backToHome() {
+    returnToHome();
+}
+
+
 /* ==================== 认知科学升级：艾宾浩斯遗忘曲线引擎 (Make It Stick) ==================== */
 const MEMORY_KEY = 'rocky_memory_vault_v1';
 let memoryVault = JSON.parse(localStorage.getItem(MEMORY_KEY) || '{}');
@@ -1285,8 +1315,9 @@ let feynmanLastAudioUrl = null;
 
 // 打开小老师讲台
 function openFeynmanStudio(presetTitle, presetQuestion, presetHint) {
-    const defaultTitle = presetTitle || (currentQueue[currentIndex] ? (currentQueue[currentIndex].title || currentQueue[currentIndex].meaning || currentQueue[currentIndex].word) : '学校今日数学/英语错题');
-    const defaultQ = presetQuestion || (currentQueue[currentIndex] ? (currentQueue[currentIndex].question || currentQueue[currentIndex].cn || '') : '');
+    const hasCur = (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]);
+    const defaultTitle = presetTitle || (hasCur ? (currentQueue[currentIndex].title || currentQueue[currentIndex].meaning || currentQueue[currentIndex].word) : '学校今日数学/英语错题');
+    const defaultQ = presetQuestion || (hasCur ? (currentQueue[currentIndex].question || currentQueue[currentIndex].cn || '') : '');
 
     showModal(`
         <div class="feynman-studio-card">
@@ -2350,6 +2381,49 @@ function fallbackWebSpeech(text, onEndCallback) {
     } catch(e){}
 }
 
+
+// ==================== 兼容补全缺失的音频发音与连招函数 ====================
+function playCurrentStandard() {
+    if (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) {
+        const cur = currentQueue[currentIndex];
+        const text = cur.word || cur.en || '';
+        if (text) playAudioItem(cur.word ? 'word' : 'text', text);
+    }
+}
+function playCurrentPhonicsSlow() {
+    if (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) {
+        const cur = currentQueue[currentIndex];
+        if (cur.word) {
+            playAudioItem('phonics', cur.word);
+        } else if (cur.en) {
+            playAudioItem('text', cur.en);
+        }
+    }
+}
+function playCurrentSlow() {
+    playCurrentPhonicsSlow();
+}
+function playComboWord() {
+    if (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) {
+        const cur = currentQueue[currentIndex];
+        if (cur.word) playAudioItem('word', cur.word);
+    }
+}
+function playComboPhrase() {
+    if (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) {
+        const cur = currentQueue[currentIndex];
+        const text = cur.phrase || cur.word || '';
+        if (text) playAudioItem('word', text);
+    }
+}
+function playComboSentence() {
+    if (typeof currentQueue !== 'undefined' && currentQueue && currentQueue[currentIndex]) {
+        const cur = currentQueue[currentIndex];
+        const text = cur.en || cur.sentence || '';
+        if (text) playAudioItem('text', text);
+    }
+}
+
 // 统一标准发音入口
 function speakWordStandard(text) {
     playAudioItem('word', text);
@@ -3059,7 +3133,7 @@ const oldCurriculumTexts = {
 
 
 /* ==================== 语数英三科统一状态与元数据 ==================== */
-let curSubject = 'en'; // 'en' | 'math' | 'cn'
+curSubject = 'en'; // 'en' | 'math' | 'cn'
 
 const unitMetaMath = [
     { key: "math_u1", badge: "第1单元", title: "万以上数的认识", desc: "数位分级 · 亿以内/亿以上读写 · 近似数与1亿有多大" },
@@ -3122,13 +3196,13 @@ function setSubject(sub) {
 }
 
 /* ==================== 6. 界面切换与全局状态 ==================== */
-let curVersion = 'new'; // 'new' (2024新课标) 或 'old' (2013老版)
-let curMode = 'words';   // 'words' 或 'texts'
-let currentQueue = [];
-let currentIndex = 0;
-let currentMistakesThisRound = [];
-let bossMaxHp = 100;
-let bossHp = 100;
+curVersion = 'new'; // 'new' (2024新课标) 或 'old' (2013老版)
+curMode = 'words';   // 'words' 或 'texts'
+currentQueue = [];
+currentIndex = 0;
+currentMistakesThisRound = [];
+bossMaxHp = 100;
+bossHp = 100;
 
 const unitMetaNew = [
     { key: "new_u1", badge: "Unit 1", title: "Helping at home", desc: "做家务与家庭职业 (doctor, cook...)" },
