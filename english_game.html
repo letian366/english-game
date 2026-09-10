@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>四年级英语打怪战 · 2024新课标PEP全功能版</title>
+    <title>四年级语数英打怪战 · 每日10分钟真正学会通关系统</title>
     <style>
         :root {
             --primary: #2e7d32;
@@ -77,6 +77,100 @@
             margin-bottom: 4px;
         }
 
+        
+        /* 学科选择导航 */
+        .subject-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        .subject-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 9px 4px;
+            font-size: 13px;
+            font-weight: 800;
+            color: #475569;
+            border-radius: 9px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+        .subject-btn.active {
+            background: #ffffff;
+            color: #0f172a;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+        }
+        .subject-btn.en.active { color: #15803d; }
+        .subject-btn.math.active { color: #0369a1; }
+        .subject-btn.cn.active { color: #b45309; }
+
+        /* 心流结界计时器 */
+        .flow-timer {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid #fecaca;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 数学与语文卡片展示样式 */
+        .model-diagram-box {
+            background: #f0fdf4;
+            border: 1px dashed #86efac;
+            padding: 10px 12px;
+            border-radius: 10px;
+            margin: 8px 0;
+            font-family: monospace, sans-serif;
+            font-size: 12px;
+            color: #166534;
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        .reasoning-box {
+            background: #eff6ff;
+            border-left: 3px solid #3b82f6;
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            margin: 6px 0;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.4;
+        }
+        .trap-box-alert {
+            background: #fef2f2;
+            border-left: 3px solid #ef4444;
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            margin: 6px 0;
+            font-size: 12px;
+            color: #991b1b;
+            line-height: 1.4;
+            font-weight: 700;
+        }
+        .variant-box {
+            background: #fefce8;
+            border-left: 3px solid #eab308;
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            margin: 6px 0;
+            font-size: 12px;
+            color: #854d0e;
+            line-height: 1.4;
+        }
+    
         /* 版本与模式切换 */
         .version-switcher {
             display: flex;
@@ -397,14 +491,22 @@
 
         <!-- 首页关卡选择 -->
         <div id="home-screen">
-            <div class="hero-banner">
+            
+        <!-- 学科大厅选择器 (基于三本书打造的语数英每日10分钟通关体系) -->
+        <div class="subject-nav">
+            <button class="subject-btn en active" id="sub-btn-en" onclick="setSubject('en')">🔤 英语秘境</button>
+            <button class="subject-btn math" id="sub-btn-math" onclick="setSubject('math')">🔢 数学神殿</button>
+            <button class="subject-btn cn" id="sub-btn-cn" onclick="setSubject('cn')">📖 语文圣域</button>
+        </div>
+    
+        <div class="hero-banner">
                 <span class="edition-tag">✨ 2024审定 · 2022新课标教材</span>
                 <h1>⚔️ PEP英语打怪战 · 四年级上</h1>
                 <p>听音能写 · 见词能读 · 课文背诵攻擂</p>
             </div>
 
             <!-- 教材版本切换 -->
-            <div class="version-switcher">
+            <div class="version-switcher" id="version-switcher-box">
                 <button class="version-btn active" id="btn-v-new" onclick="setCurriculumVersion('new')">
                     🌟 2024/2025新课标版 (当前正课)
                 </button>
@@ -427,7 +529,7 @@
         <div id="game-screen">
             <div class="game-nav">
                 <button class="nav-btn" onclick="returnToHome()">🏠</button>
-                <div class="stage-title" id="stage-title-text">Unit 1 挑战中</div>
+                <div style="display:flex;align-items:center;gap:6px;"><div class="stage-title" id="stage-title-text">Unit 1 挑战中</div><div class="flow-timer" id="flow-timer">⏱️ 10:00</div></div>
                 <button class="hunter-btn" onclick="openMistakeBag()">🎒 错题本 (<span id="mistake-badge">0</span>)</button>
             </div>
 
@@ -475,6 +577,43 @@
                         <button class="action-voice-btn" onclick="playCurrentStandard()">🔊 听整词发音</button>
                         <button class="action-voice-btn" onclick="playCurrentPhonicsSlow()">🧩 听音节拼读</button>
                     </div>
+                </div>
+
+
+                <!-- 数学核心思维卡片 (画图建模 + 算理剖析 + 破绽防坑) -->
+                <div class="math-card" id="math-reveal-card" style="display:none;background:#fff;border:2px solid #bae6fd;border-radius:14px;padding:14px;margin-top:10px;text-align:left;box-shadow:0 3px 10px rgba(2,132,199,0.06);">
+                    <div style="font-size:12px;font-weight:800;color:#0284c7;margin-bottom:4px;">🎯 核心破局算式与答案：</div>
+                    <div id="math-ans-text" style="font-size:16px;font-weight:900;color:#0f172a;margin-bottom:8px;background:#f0f9ff;padding:8px 12px;border-radius:8px;border:1px solid #e0f2fe;"></div>
+                    
+                    <div style="font-size:11px;font-weight:800;color:#166534;margin-top:8px;">📐 画图建模模型 (把抽象变具象)：</div>
+                    <div class="model-diagram-box" id="math-model-diagram"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#1e40af;margin-top:8px;">💡 算理小老师讲解 (真正学会的底层心智)：</div>
+                    <div class="reasoning-box" id="math-reasoning-text"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#991b1b;margin-top:8px;">⚠️ 知识坍缩与常见破绽 (破绽防坑)：</div>
+                    <div class="trap-box-alert" id="math-trap-text"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#854d0e;margin-top:8px;">✨ 举一反三变式小招：</div>
+                    <div class="variant-box" id="math-variant-text"></div>
+                </div>
+
+                <!-- 语文核心素养卡片 (形义防坑 + 偏旁溯源 + 诗文诵读) -->
+                <div class="chinese-card" id="chinese-reveal-card" style="display:none;background:#fff;border:2px solid #fde68a;border-radius:14px;padding:14px;margin-top:10px;text-align:left;box-shadow:0 3px 10px rgba(217,119,6,0.06);">
+                    <div style="font-size:12px;font-weight:800;color:#b45309;margin-bottom:4px;">📖 核心字词与正解：</div>
+                    <div id="cn-ans-text" style="font-size:16px;font-weight:900;color:#0f172a;margin-bottom:8px;background:#fefce8;padding:8px 12px;border-radius:8px;border:1px solid #fef08a;white-space:pre-wrap;"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#166534;margin-top:8px;">💡 偏旁字源与形义解构 (理解字理永不写错)：</div>
+                    <div class="model-diagram-box" id="cn-source-text" style="background:#fefce8;border-color:#fde047;color:#713f12;"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#1e40af;margin-top:8px;">🎨 意象画面与内涵品读：</div>
+                    <div class="reasoning-box" id="cn-reasoning-text"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#991b1b;margin-top:8px;">⚠️ 易错笔画与破绽防坑口诀：</div>
+                    <div class="trap-box-alert" id="cn-trap-text"></div>
+
+                    <div style="font-size:11px;font-weight:800;color:#854d0e;margin-top:8px;">✨ 经典原句美句积累：</div>
+                    <div class="variant-box" id="cn-variant-text"></div>
                 </div>
 
                 <!-- 课文纯背诵核对卡片 -->
@@ -1201,6 +1340,154 @@ const newCurriculumTexts = {
     ]
 };
 
+/* ==================== 四年级数学核心思维库 (画图建模 + 算理口述) ==================== */
+const mathGrade4Data = {
+    math_u1: [
+        {
+            id: 1,
+            title: "大数的读写与数位分级",
+            question: "我国2020年第七次全国人口普查中，北京市常住人口约为 21893095 人。\\n✏️ 请在草稿纸上：\\n1. 用竖线画出“数级划分线”（个级、万级）；\\n2. 大声读出这个数，并写出大写读法；\\n3. 说明末尾的 0 读不读，中间的 0 读几个。",
+            hint: "从个位起每四位一级画竖线：2189|3095。万级按个级读法加上“万”，中间有0读一个，末尾0不读。",
+            answerText: "二千一百八十九万三千零九十五",
+            mathModel: "数位分级模型：\\n[千万 百万 十万 万] | [千 百 十 个]\\n  2   1   8   9   |  3  0  9  5",
+            logicReasoning: "分级法是破除大数恐惧的神器！先四位一断，万级是 2189（读作：二千一百八十九万），个级是 3095（读作：三千零九十五）。十位前面的 0 在中间，只读一个零！",
+            trapRule: "破绽防坑：每级末尾的 0 都不读（如2180万末尾0不读）；每级中间无论连续有几个0，都只读一个零！",
+            variantRule: "变式小招：把它四舍五入省略“万”后面的尾数大约是多少？看千位是3<5，约是 2189 万！"
+        },
+        {
+            id: 2,
+            title: "大数的改写与四舍五入",
+            question: "太阳系中，太阳的直径约为 1392000 千米，地球到太阳的平均距离约为 149600000 千米。\\n✏️ 请在草稿纸上：\\n1. 把 1392000 省略“万”后面的尾数求近似数；\\n2. 把 149600000 四舍五入到“亿”位求近似数。",
+            hint: "省略万位看千位（满5进1），省略亿位看千万位（满5进1）。",
+            answerText: "1392000 ≈ 139万；149600000 ≈ 1亿 (或精确到1.5亿)",
+            mathModel: "四舍五入标杆线：\\n139|2000 -> 看千位是2，2 < 5，舍去 -> 约 139 万\\n1|49600000 -> 看千万位是4，4 < 5，舍去 -> 约 1 亿",
+            logicReasoning: "关键在于找准“目标数位”和“裁判数位”！省略万位，裁判是千位（2<5舍）；省略亿位，裁判是千万位（4<5舍）。",
+            trapRule: "破绽防坑：注意单位“万”和“亿”一定不能丢！写近似数一定要用“≈”而不是“=”！",
+            variantRule: "变式小招：如果某恒星距离是 156000000，四舍五入到亿位是多少？看千万位5，满5进1，约是 2 亿！"
+        }
+    ],
+    math_u2: [
+        {
+            id: 3,
+            title: "公顷与平方千米具象感知",
+            question: "一个标准足球场的长约是 100 米，宽约是 70 米，面积约是 7000 平方米。\\n✏️ 请在草稿纸上推导计算：\\n1. 边长多少米的正方形面积正好是 1 公顷？\\n2. 1 公顷合多少个标准足球场的面积？\\n3. 边长 1 千米的正方形面积是 1 平方千米，合多少公顷？",
+            hint: "100×100 = 10000平方米 = 1公顷；1平方千米 = 1000米×1000米 = 1000000平方米 = 100公顷。",
+            answerText: "1公顷 = 10000平方米 (约1.4个足球场)；1平方千米 = 100公顷 = 1000000平方米",
+            mathModel: "面积进率阶梯图：\\n[平方千米] ──×100──> [公顷] ──×10000──> [平方米]",
+            logicReasoning: "在脑中建立空间具象：学校 400 米跑道围起来的操场面积大约是 1 公顷！祖国领土或城市面积用平方千米，森林农田果园用公顷，教室操场用平方米！",
+            trapRule: "破绽防坑：公顷和平方米之间的进率是 10000（4个零！），而平方千米和公顷进率是 100（2个零！），千万别记混！",
+            variantRule: "变式小招：一块长方形果园长 400 米，宽 250 米，它的面积是多少公顷？400×250=100000平方米=10公顷！"
+        }
+    ],
+    math_u3: [
+        {
+            id: 4,
+            title: "角的分类与量角动态推导",
+            question: "一副三角尺拼成的角，一个三角尺是 45°、45°、90°，另一个是 30°、60°、90°。\\n✏️ 请在草稿纸上画草图并推导：\\n1. 把 45° 的角和 60° 的角拼在一起，拼出的是什么角？多少度？\\n2. 一个平角等于几个直角？一个周角等于几个平角？\\n3. 钟面上 3 时整和 6 时整，时针和分针分别成多少度的角？",
+            hint: "锐角<90°，直角=90°，90°<钝角<180°，平角=180°，周角=360°。钟面一大格是30°。",
+            answerText: "45°+60°=105°(钝角)；1平角=2直角；1周角=2平角=4直角；3时是90°(直角)，6时是180°(平角)",
+            mathModel: "角的层级进阶图：\\n锐角(<90°) < 直角(90°) < 钝角(90°~180°) < 平角(180°) < 周角(360°)",
+            logicReasoning: "角是由一点引出的两条射线组成的图形。把两条射线看作开扇子：展开一条平线是平角（180°），转一整圈回到起点是周角（360°）！",
+            trapRule: "破绽防坑：平角是一条“线”吗？错！平角是一个角，两边成一条直线，必须标出顶点！周角也是角！",
+            variantRule: "变式小招：用一副三角尺还能拼出 75°（30+45）、135°（90+45）、150°（90+60）、15°（45-30）！"
+        }
+    ],
+    math_u4: [
+        {
+            id: 5,
+            title: "速度时间路程线段图与积的变化",
+            question: "一列复兴号高铁列车从北京开往上海，速度是 350 千米/小时，行驶了 4 小时。\\n✏️ 请在草稿纸上：\\n1. 画出速度、时间与总路程的线段关系图；\\n2. 列出乘法算式并口述算理；\\n3. 如果速度不变，行驶时间乘 2 变成 8 小时，路程会怎么变化？",
+            hint: "速度 × 时间 = 路程。积的变化规律：一个因数不变，另一个因数乘几，积也乘几。",
+            answerText: "350 × 4 = 1400 (千米)；路程也会乘 2，变成 2800 千米",
+            mathModel: "线段图建模：\\n|──350km/h──|──350km/h──|──350km/h──|──350km/h──|\\n0           1小时       2小时       3小时       4小时 = 1400km",
+            logicReasoning: "速度就是“每小时/每分钟行走的快慢”，时间是“走的时长”，路程是“总长度”。核心公式三剑客：路程=速度×时间；速度=路程÷时间；时间=路程÷速度！",
+            trapRule: "破绽防坑：计算 350×4 时，先算 35×4=140，末尾再添 1 个 0 得到 1400。算竖式时末尾 0 对齐不要加错位置！",
+            variantRule: "变式小招：如果两数相乘积是 120，一个因数乘 3，另一个因数除以 3，积是多少？积不变，还是 120！"
+        }
+    ],
+    math_u5: [
+        {
+            id: 6,
+            title: "数学广角·烙饼与沏茶最优策略",
+            question: "妈妈用平底锅烙饼，每次只能同时烙 2 张饼，两面都要烙，每面需要 3 分钟。\\n✏️ 请在草稿纸上画出时间统筹图：\\n1. 烙 2 张饼最少需要几分钟？\\n2. 烙 3 张饼最少需要几分钟？怎么操作才能让锅不空着？",
+            hint: "烙2张：同时烙正反面（6分钟）；烙3张交替法：先烙1正2正，再烙1反3正，最后烙2反3反！",
+            answerText: "烙2张最少6分钟；烙3张最少9分钟 (交替轮换烙法，锅永远放满2张)",
+            mathModel: "交替轮换时序图 (让锅永不闲置)：\\n第1~3分钟：[饼1正面] + [饼2正面]\\n第3~6分钟：[饼1反面(出锅!)] + [饼3正面]\\n第6~9分钟：[饼2反面(出锅!)] + [饼3反面(出锅!)]\\n总计：3轮 × 3分钟 = 9分钟！",
+            logicReasoning: "优化策略的灵魂：消除闲置资源！如果先烙完前2张（6分），再单独烙第3张（6分），要12分钟，第3张时锅空了一半！采用轮换法锅一直满负荷！",
+            trapRule: "破绽防坑：规律口诀：饼数×每面时间=最少时间（饼数>1时，每张多烙一面加3分钟，单数张用交替轮换）！",
+            variantRule: "变式小招：如果要烙 5 张饼最少要几分钟？先烙2张（6分）+ 再用轮换法烙3张（9分）= 15分钟！"
+        }
+    ]
+};
+
+/* ==================== 四年级语文核心素养库 (形义防坑 + 诗文诵读) ==================== */
+const chineseGrade4Data = {
+    cn_u1: [
+        {
+            id: 1,
+            title: "字词形义防坑 · 观潮奇观",
+            question: "“那条白线很快向我们移来，逐渐拉长，变粗，横 ( ) 江面。潮来时，犹如千万匹白色战马齐头并进，浩浩荡荡地飞奔而来。”\\n✏️ 请在草稿纸上：\\n1. 默写出横 ( ) 的生字；\\n2. 默写“山崩地 ( )”的裂字；\\n3. 说明横贯的“贯”上半部分怎么写。",
+            hint: "横贯江面的贯，上部不是母也不是毋，是折文变形；山崩地裂的裂是衣字底，不是裂缝的裂有刀。",
+            answerText: "横贯 (guàn) ；山崩地裂 (liè)",
+            cnSource: "部首形义拆解：\\n• 贯：上面折文，中间两笔，下面是贝字底（古人把贝壳穿在一起叫贯，引申为穿通、贯通）。\\n• 裂：上面是列，下面是衣（古人用刀把布帛裁割开，衣服撕开为裂）。",
+            logicReasoning: "理解形义才能永不写错！钱塘江大潮横贯江面，就像一条白练从江的一边穿通到另一边，所以是“贯穿”的贯；地动山摇如同衣服被撕开，所以是“衣字底”的裂！",
+            trapRule: "破绽防坑：贯字上部笔顺：竖折、横折、横、竖、横折、竖、提，千万别写成四点底或毋字头！",
+            variantRule: "经典美句诵读：“浪潮越来越近，犹如千万匹白色战马齐头并进，浩浩荡荡地飞奔而来；那声音如同千万辆坦克同时开动，发出山崩地裂的响声。”"
+        },
+        {
+            id: 2,
+            title: "诗文名句脱稿 · 《鹿柴》与《暮江吟》",
+            question: "《暮江吟》是白居易的名篇，描绘了夕阳西下到九月初三夜晚的江畔美景。\\n✏️ 请在草稿纸上：\\n1. 脱稿默写后两句：“可怜九月初三夜，露似真珠月似弓。”\\n2. 说明诗中“可怜”是什么意思？\\n3. 露水为什么像真珠？月亮为什么像弓？",
+            hint: "可怜在古诗中是“可爱”的意思；真珠即珍珠；九月初三是蛾眉月，弯弯如弓。",
+            answerText: "可怜九月初三夜，露似真珠月似弓。\\n“可怜”意思是：可爱！",
+            cnSource: "核心意象画面：\\n前两句：“一道残阳铺水中，半江瑟瑟半江红。” (晚霞映江的冷暖色彩交织)\\n后两句：“可怜九月初三夜，露似真珠月似弓。” (晶莹露珠与初三弯月的灵动静谧)",
+            logicReasoning: "写诗如同画画！白居易先抓大远景：残阳贴着水面“铺”开，江水受光处红、背光处碧绿（瑟瑟）；再抓近景特写：草叶上晶莹的露珠如同珍珠，天空中初升的弦月宛如弯弓，令人由衷赞叹“可爱”！",
+            trapRule: "破绽防坑：“瑟瑟”指青绿色，别写成哆嗦的颤抖；“真珠”古汉语通“珍珠”，默写时尊重原诗用词；“弓”字三笔写端正！",
+            variantRule: "拓展对句：《鹿柴》王维：“空山不见人，但闻人语响。返景入深林，复照青苔上。”"
+        }
+    ],
+    cn_u2: [
+        {
+            id: 3,
+            title: "字词形义防坑 · 提问与科学探索",
+            question: "科学家经过反复 ( ) 究，终于揭开了蝙蝠能在夜间飞行的秘密。它不是靠眼睛，而是用嘴和耳朵配合起来 ( ) 探的。\\n✏️ 请在草稿纸上：\\n1. 默写“研 ( )”的究；\\n2. 默写“侦 ( )”的探；\\n3. 默写易错字“即 ( )”与“既 ( )”的区别。",
+            hint: "究是穴字头+九；探是提手旁+罙；即使（未发生，左边无点）与既然（已发生，左边有点）。",
+            answerText: "研究 (jiū) ；侦探 (tàn) ；即使 (jí) vs 既然 (jì)",
+            cnSource: "偏旁表意记忆法：\\n• 究：穴字头（在洞穴里穷究到底）+ 九（极数），深入钻研到尽头。\\n• 即：左边像盛食物的食器，右边像人面向食器准备就餐，表示“将要、靠近”（即使、立即）。\\n• 既：右边像人吃饱了转过头去，表示“已经完成”（既然、既往不咎）。",
+            logicReasoning: "搞清“即”和“既”的字源，一辈子都不会写错！没吃完将要吃是“即使”（假设）；吃饱转身离开是“既然”（既成事实）！",
+            trapRule: "破绽防坑：“即”的右边是单耳刀（卩），千万别写成双耳旁（阝）！“探”的右下部分不要多加撇！",
+            variantRule: "经典句式应用：“科学家模仿蝙蝠探路的方法，给飞机装上了雷达。即使在漆黑的夜里，飞机也能安全飞行。”"
+        }
+    ],
+    cn_u3: [
+        {
+            id: 4,
+            title: "诗文哲理脱稿 · 《题西林壁》",
+            question: "苏轼游览庐山，从不同角度看山景，写下了千古哲理名诗。\\n✏️ 请在草稿纸上：\\n1. 脱稿默写全诗四句；\\n2. 用自己的话说出后两句蕴含的深层哲理；\\n3. 解释“不识”和“缘”的意思。",
+            hint: "横看成岭侧成峰，远近高低各不同。不识庐山真面目，只缘身在此山中。缘：因为。",
+            answerText: "横看成岭侧成峰，远近高低各不同。\\n不识庐山真面目，只缘身在此山中。\\n哲理：要想看清事物的全面本质，不能局限在狭隘的局部，必须跳出来从宏观多角度观察！",
+            cnSource: "心智模型透视：\\n• 空间视角转换：横看(连绵山岭) vs 侧看(峭拔孤峰) vs 远/近/高/低 (千姿百态)\\n• 哲学归纳：当局者迷，旁观者清！“缘”即“因为”。",
+            logicReasoning: "苏轼不仅仅是在写山，是在教我们怎么思考！《学习观》里提到的“盲人摸象与片面坍缩”，正是“只缘身在此山中”！跳出局部，才能看到全貌。",
+            trapRule: "破绽防坑：“峰”是山字旁+夆（别写成锋利的锋）；“缘”字右边是彖（豕字上面带折），笔顺要写规范；“壁”是土字底！",
+            variantRule: "经典对读：朱熹《观书有感》：“问渠那得清如许？为有源头活水来。”"
+        }
+    ],
+    cn_u4: [
+        {
+            id: 5,
+            title: "神话传奇诵读 · 《盘古开天地》与《精卫填海》",
+            question: "《精卫填海》选自《山海经·北山经》：“炎帝之少女，名曰女娃。女娃游于东海，溺而不返，故为精卫，常衔西山之木石，以堙于东海。”\\n✏️ 请在草稿纸上：\\n1. 默写“衔西山之木石，以 ( ) 于东海”的湮字；\\n2. 解释“少女”、“溺”、“堙”的文言含义；\\n3. 精卫鸟体现了中华民族什么样的精神？",
+            hint: "少女：小女儿；溺：溺水淹没；堙(yīn)：填塞。体现不畏艰难、坚韧不拔的意志。",
+            answerText: "以堙 (yīn) 于东海。\\n少女：小女儿；溺：淹没在水中；堙：填塞、填满。\\n精神：坚韧不拔、不屈不挠、与大自然顽强抗争的伟大精神！",
+            cnSource: "文言文精炼字词：\\n• 堙：土字旁 + 垔(西+土)，用土石将深坑洼地填平塞满。\\n• 溺：水字旁 + 弱，人落水中体弱无力被淹没。",
+            logicReasoning: "小学文言文抓字眼！“故为精卫”的故是“所以”；“少女”千万不能按现代汉语理解成年轻女孩，在先秦文言里是指炎帝最小的女儿！",
+            trapRule: "破绽防坑：“堙”是土字旁，不要写成水字旁；“衔”是行字框夹着金字偏旁（用嘴含着），中间别丢点！",
+            variantRule: "《盘古开天地》美句：“倒下的盘古，身体发生了巨大的变化：呼出的气息变成了四季的风和飘动的云；发出的声音化作了隆隆的雷声……”"
+        }
+    ]
+};
+
+
 /* ==================== 5. 2013老版人教PEP备用数据 ==================== */
 const oldCurriculumWords = {
     old_u1: [
@@ -1223,6 +1510,64 @@ const oldCurriculumTexts = {
         { en: "Let's clean the classroom.", cn: "我们来打扫教室吧。" }
     ]
 };
+
+
+/* ==================== 语数英三科统一状态与元数据 ==================== */
+let curSubject = 'en'; // 'en' | 'math' | 'cn'
+
+const unitMetaMath = [
+    { key: "math_u1", badge: "第1单元", title: "大数的认识", desc: "数位分级 · 读写法则 · 四舍五入求近似数" },
+    { key: "math_u2", badge: "第2单元", title: "公顷和平方千米", desc: "空间具象感知 · 面积单位进率阶梯图" },
+    { key: "math_u3", badge: "第3单元", title: "角的度量", desc: "射线平角周角 · 三角尺拼角动态推导" },
+    { key: "math_u4", badge: "第4单元", title: "三位数乘两位数", desc: "速度时间路程线段图 · 积的变化规律" },
+    { key: "math_u5", badge: "第8单元", title: "数学广角·优化策略", desc: "烙饼问题 · 沏茶最优解 · 消除闲置资源" }
+];
+
+const unitMetaCn = [
+    { key: "cn_u1", badge: "第1单元", title: "自然奇观与意象", desc: "《观潮》横贯裂衣形义 · 《暮江吟》露似真珠" },
+    { key: "cn_u2", badge: "第2单元", title: "提问与科学探索", desc: "《蝙蝠和雷达》科学思维 · 即/既字源辨析" },
+    { key: "cn_u3", badge: "第3单元", title: "处处留心皆学问", desc: "《题西林壁》当局者迷哲理 · 视角转换" },
+    { key: "cn_u4", badge: "第4单元", title: "神话传奇与精神", desc: "《精卫填海》文言实词 · 《盘古开天地》" }
+];
+
+function setSubject(sub) {
+    curSubject = sub;
+    document.getElementById('sub-btn-en').classList.toggle('active', sub === 'en');
+    document.getElementById('sub-btn-math').classList.toggle('active', sub === 'math');
+    document.getElementById('sub-btn-cn').classList.toggle('active', sub === 'cn');
+
+    const heroTitle = document.getElementById('hero-title');
+    const heroDesc = document.getElementById('hero-desc');
+    const editionTag = document.getElementById('edition-tag-text');
+    const versionSwitcher = document.getElementById('version-switcher-box');
+    const tabWords = document.getElementById('tab-words');
+    const tabTexts = document.getElementById('tab-texts');
+
+    if (sub === 'en') {
+        if (heroTitle) heroTitle.innerText = '四年级英语打怪战';
+        if (heroDesc) heroDesc.innerText = '杨妈自然拼读法 · 听音能写 · 课文原声脱稿背诵 · 每日10分钟';
+        if (editionTag) editionTag.innerText = '人教版PEP 2024新课标 (四年级上册)';
+        if (versionSwitcher) versionSwitcher.style.display = 'flex';
+        if (tabWords) tabWords.innerText = '🔤 单词拼读战';
+        if (tabTexts) tabTexts.innerText = '📖 课文背诵境';
+    } else if (sub === 'math') {
+        if (heroTitle) heroTitle.innerText = '四年级数学核心思维殿堂';
+        if (heroDesc) heroDesc.innerText = '画图建模 · 算理小老师口述 · 拒绝假懂 · 每日10分钟真正学会';
+        if (editionTag) editionTag.innerText = '人教版数学四年级上册核心思维';
+        if (versionSwitcher) versionSwitcher.style.display = 'none';
+        if (tabWords) tabWords.innerText = '📐 思维概念破局';
+        if (tabTexts) tabTexts.innerText = '📊 建模应用通关';
+    } else if (sub === 'cn') {
+        if (heroTitle) heroTitle.innerText = '四年级语文核心素养圣域';
+        if (heroDesc) heroDesc.innerText = '字词形义防坑 · 经典诗文脱稿诵读 · 意象画面捕捉 · 每日10分钟';
+        if (editionTag) editionTag.innerText = '统编版语文四年级上册核心精选';
+        if (versionSwitcher) versionSwitcher.style.display = 'none';
+        if (tabWords) tabWords.innerText = '✍️ 字词形义防坑战';
+        if (tabTexts) tabTexts.innerText = '📜 经典名篇脱稿诵';
+    }
+
+    renderUnitSelectionGrid();
+}
 
 /* ==================== 6. 界面切换与全局状态 ==================== */
 let curVersion = 'new'; // 'new' (2024新课标) 或 'old' (2013老版)
@@ -1263,8 +1608,20 @@ function switchMode(mode) {
 
 function renderUnitSelectionGrid() {
     const container = document.getElementById('unit-selection-grid');
-    const metaList = curVersion === 'new' ? unitMetaNew : unitMetaOld;
-    const modeName = curMode === 'words' ? '拼读战' : '背诵秘境';
+    if (!container) return;
+    let metaList = [];
+    let modeName = '';
+
+    if (curSubject === 'en') {
+        metaList = curVersion === 'new' ? unitMetaNew : unitMetaOld;
+        modeName = curMode === 'words' ? '拼读战' : '背诵秘境';
+    } else if (curSubject === 'math') {
+        metaList = unitMetaMath;
+        modeName = '思维建模';
+    } else if (curSubject === 'cn') {
+        metaList = unitMetaCn;
+        modeName = '素养防坑';
+    }
 
     container.innerHTML = metaList.map(u => `
         <div class="unit-card" onclick="startLevel('${u.key}', '${u.title}')">
@@ -1274,13 +1631,18 @@ function renderUnitSelectionGrid() {
         </div>
     `).join('');
 }
-
 function startLevel(key, title) {
     let source;
-    if (curVersion === 'new') {
-        source = curMode === 'words' ? newCurriculumWords[key] : newCurriculumTexts[key];
-    } else {
-        source = curMode === 'words' ? oldCurriculumWords[key] : oldCurriculumTexts[key];
+    if (curSubject === 'en') {
+        if (curVersion === 'new') {
+            source = curMode === 'words' ? newCurriculumWords[key] : newCurriculumTexts[key];
+        } else {
+            source = curMode === 'words' ? oldCurriculumWords[key] : oldCurriculumTexts[key];
+        }
+    } else if (curSubject === 'math') {
+        source = mathGrade4Data[key];
+    } else if (curSubject === 'cn') {
+        source = chineseGrade4Data[key];
     }
 
     if (!source || source.length === 0) {
@@ -1293,13 +1655,64 @@ function startLevel(key, title) {
     bossMaxHp = currentQueue.length * 10;
     bossHp = bossMaxHp;
 
-    document.getElementById('stage-title-text').innerText = title + ' (' + (curMode === 'words' ? '单词拼读' : '课文背诵') + ')';
+    const subName = curSubject === 'en' ? (curMode === 'words' ? '英语拼读' : '课文背诵') : (curSubject === 'math' ? '数学思维' : '语文素养');
+    document.getElementById('stage-title-text').innerText = title + ' (' + subName + ')';
     document.getElementById('home-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'flex';
-    document.getElementById('boss-emoji').innerText = curMode === 'words' ? '🐉' : '🧙‍♂️';
 
+    if (curSubject === 'en') {
+        document.getElementById('boss-emoji').innerText = curMode === 'words' ? '🐉' : '🧙‍♂️';
+    } else if (curSubject === 'math') {
+        document.getElementById('boss-emoji').innerText = '🤖';
+    } else {
+        document.getElementById('boss-emoji').innerText = '🦁';
+    }
+
+    startFlowTimer();
     updateBossDisplay();
     renderQuestion();
+}
+
+/* ==================== 10分钟心流结界倒计时 ==================== */
+let flowTimerInterval = null;
+let flowSecondsLeft = 600; // 10分钟 = 600秒
+
+function startFlowTimer() {
+    if (flowTimerInterval) clearInterval(flowTimerInterval);
+    flowSecondsLeft = 600;
+    updateFlowTimerDisplay();
+    flowTimerInterval = setInterval(() => {
+        flowSecondsLeft--;
+        updateFlowTimerDisplay();
+        if (flowSecondsLeft <= 0) {
+            clearInterval(flowTimerInterval);
+            onFlowTimerEnd();
+        }
+    }, 1000);
+}
+
+function stopFlowTimer() {
+    if (flowTimerInterval) clearInterval(flowTimerInterval);
+}
+
+function updateFlowTimerDisplay() {
+    const m = Math.floor(flowSecondsLeft / 60);
+    const s = flowSecondsLeft % 60;
+    const el = document.getElementById('flow-timer');
+    if (el) el.innerText = `⏱️ ${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+function onFlowTimerEnd() {
+    openModal(`
+        <h2 class="modal-title" style="color:var(--danger);">⏱️ 每日10分钟心流结界达成！</h2>
+        <p style="font-size:13px;color:#475569;margin-bottom:12px;line-height:1.6;">
+            根据《学习观》与脑科学原理：大脑的高质量专注时长有限，短周期高频刺激最有效！今日深度学习任务已圆满收工。
+        </p>
+        <div style="background:#fef2f2;border:1px solid #fecaca;padding:12px;border-radius:10px;margin-bottom:14px;color:#991b1b;font-weight:700;">
+            🌟 今日神经通路强化完成！为了保护视力与维持大脑高效状态，请立刻离开屏幕去户外活动！
+        </div>
+        <button class="btn-large" onclick="closeModal(); backToHome();">🎉 完成打卡，明天再来！</button>
+    `);
 }
 
 function updateBossDisplay() {
@@ -1316,6 +1729,11 @@ function renderQuestion() {
     const cur = currentQueue[currentIndex];
     document.getElementById('answer-card').style.display = 'none';
     document.getElementById('textbook-reveal-card').style.display = 'none';
+    const mathCard = document.getElementById('math-reveal-card');
+    const cnCard = document.getElementById('chinese-reveal-card');
+    if (mathCard) mathCard.style.display = 'none';
+    if (cnCard) cnCard.style.display = 'none';
+
     document.getElementById('btn-show-answer').style.display = 'block';
     document.getElementById('judge-btn-group').style.display = 'none';
 
@@ -1324,101 +1742,92 @@ function renderQuestion() {
     const btnShowAnswer = document.getElementById('btn-show-answer');
     const btnWrong = document.getElementById('btn-judge-wrong');
     const btnCorrect = document.getElementById('btn-judge-correct');
+    const preListenArea = document.getElementById('pre-listen-area');
 
-    if (curMode === 'words') {
-        // 单词模式：强调纸上默写 + 杨妈自然拼读
-        document.getElementById('prompt-tag-text').innerText = '✏️ 请在草稿纸上拼写默出：';
-        document.getElementById('main-prompt-text').innerText = cur.meaning;
-        btnPhonics.style.display = 'inline-flex';
-        btnPhonics.innerHTML = '👂 听杨妈拆音拼读';
-        btnStandard.innerHTML = '🔊 标准读音';
-        btnShowAnswer.innerText = '👀 纸上默写好了，对答案';
-        btnWrong.innerText = '❌ 拼错了';
-        btnCorrect.innerText = '🗡️ 刺中！拼对了 (触发三连招)';
-    } else {
-        // 课文模式：纯大声背诵，彻底免除默写负担！
-        document.getElementById('prompt-tag-text').innerText = '🗣️ 看着中文意思，请大声背诵出英文原句：';
-        document.getElementById('main-prompt-text').innerText = cur.cn;
-        btnPhonics.style.display = 'inline-flex';
-        btnPhonics.innerHTML = '👂 想不起来？听原声提示';
-        btnStandard.innerHTML = '🐢 慢速领读一遍';
-        btnShowAnswer.innerText = '🗣️ 我大声背完了，对答案';
-        btnWrong.innerText = '⚠️ 还不熟练 / 卡壳了';
-        btnCorrect.innerText = '🗡️ 流利背出！刺击魔物';
+    if (curSubject === 'en') {
+        preListenArea.style.display = 'flex';
+        if (curMode === 'words') {
+            document.getElementById('prompt-tag-text').innerText = '✏️ 请在草稿纸上拼写默出：';
+            document.getElementById('main-prompt-text').innerText = cur.meaning;
+            btnPhonics.style.display = 'inline-flex';
+            btnPhonics.innerHTML = '👂 听杨妈拆音拼读';
+            btnStandard.innerHTML = '🔊 标准读音';
+            btnShowAnswer.innerText = '👀 纸上默写好了，对答案';
+            btnWrong.innerText = '❌ 拼错了';
+            btnCorrect.innerText = '🗡️ 刺中！拼对了 (触发三连招)';
+        } else {
+            document.getElementById('prompt-tag-text').innerText = '🗣️ 看着中文意思，请大声背诵出英文原句：';
+            document.getElementById('main-prompt-text').innerText = cur.cn;
+            btnPhonics.style.display = 'inline-flex';
+            btnPhonics.innerHTML = '👂 想不起来？听原声提示';
+            btnStandard.innerHTML = '🐢 慢速领读一遍';
+            btnShowAnswer.innerText = '🗣️ 我大声背完了，对答案';
+            btnWrong.innerText = '⚠️ 还不熟练 / 卡壳了';
+            btnCorrect.innerText = '🗡️ 流利背出！刺击魔物';
+        }
+    } else if (curSubject === 'math') {
+        preListenArea.style.display = 'flex';
+        btnPhonics.style.display = 'none';
+        btnStandard.innerHTML = '💡 思考提示';
+        btnStandard.onclick = function() {
+            alert('💡 破局思路提示：\n\n' + cur.hint);
+        };
+        document.getElementById('prompt-tag-text').innerText = '📐 请在草稿纸上画图建模与列式计算：';
+        document.getElementById('main-prompt-text').innerText = cur.title + '\n\n' + cur.question;
+        btnShowAnswer.innerText = '👀 纸上推导好了，核对算理';
+        btnWrong.innerText = '❌ 算理有漏洞 / 算错了';
+        btnCorrect.innerText = '🗡️ 算理通透！准确刺击魔物';
+    } else if (curSubject === 'cn') {
+        preListenArea.style.display = 'none';
+        document.getElementById('prompt-tag-text').innerText = '📖 看着语境与提示，请在纸上工整默写或脱稿背诵：';
+        document.getElementById('main-prompt-text').innerText = cur.title + '\n\n' + cur.question;
+        btnShowAnswer.innerText = '👀 默写诵读完毕，核对形义';
+        btnWrong.innerText = '❌ 笔画写错 / 诵读卡壳';
+        btnCorrect.innerText = '🗡️ 形义通透！准确刺击魔物';
     }
 }
-
 function revealAnswer() {
     const cur = currentQueue[currentIndex];
     document.getElementById('btn-show-answer').style.display = 'none';
     document.getElementById('judge-btn-group').style.display = 'flex';
 
-    if (curMode === 'words') {
-        const answerCard = document.getElementById('answer-card');
-        answerCard.style.display = 'block';
-        document.getElementById('revealed-word-text').innerText = cur.word;
-        document.getElementById('syllable-split-text').innerHTML = cur.coloredSyllables || cur.word;
-        document.getElementById('phonics-rule-vowel').innerText = cur.vowelRule || '核心元音发音标准';
-        document.getElementById('phonics-rule-chunk').innerText = cur.chunkRule || '音节规整清晰';
-        document.getElementById('phonics-rule-trap').innerText = cur.trapRule || '细心拼写，杜绝笔误';
-        speakWordStandard(cur.word);
-    } else {
-        const textCard = document.getElementById('textbook-reveal-card');
-        textCard.style.display = 'block';
-        document.getElementById('textbook-en-text').innerText = cur.en;
-        document.getElementById('textbook-cn-text').innerText = cur.cn;
-        // 课文揭晓答案时，自动标准示范朗读一次
-        speakWordStandard(cur.en);
+    if (curSubject === 'en') {
+        if (curMode === 'words') {
+            const answerCard = document.getElementById('answer-card');
+            answerCard.style.display = 'block';
+            document.getElementById('revealed-word-text').innerText = cur.word;
+            document.getElementById('syllable-split-text').innerHTML = cur.coloredSyllables || cur.syllables.join(' · ');
+            document.getElementById('phonics-rule-vowel').innerText = cur.vowelRule;
+            document.getElementById('phonics-rule-chunk').innerText = cur.chunkRule;
+            document.getElementById('phonics-rule-trap').innerText = cur.trapRule;
+        } else {
+            const textCard = document.getElementById('textbook-reveal-card');
+            textCard.style.display = 'block';
+            document.getElementById('textbook-en-text').innerText = cur.en;
+            document.getElementById('textbook-cn-text').innerText = cur.cn;
+        }
+    } else if (curSubject === 'math') {
+        const mathCard = document.getElementById('math-reveal-card');
+        if (mathCard) {
+            mathCard.style.display = 'block';
+            document.getElementById('math-ans-text').innerText = cur.answerText;
+            document.getElementById('math-model-diagram').innerText = cur.mathModel;
+            document.getElementById('math-reasoning-text').innerText = cur.logicReasoning;
+            document.getElementById('math-trap-text').innerText = cur.trapRule;
+            document.getElementById('math-variant-text').innerText = cur.variantRule;
+        }
+    } else if (curSubject === 'cn') {
+        const cnCard = document.getElementById('chinese-reveal-card');
+        if (cnCard) {
+            cnCard.style.display = 'block';
+            document.getElementById('cn-ans-text').innerText = cur.answerText;
+            document.getElementById('cn-source-text').innerText = cur.cnSource;
+            document.getElementById('cn-reasoning-text').innerText = cur.logicReasoning;
+            document.getElementById('cn-trap-text').innerText = cur.trapRule;
+            document.getElementById('cn-variant-text').innerText = cur.variantRule;
+        }
     }
 }
-
-function playCurrentStandard() {
-    if (!currentQueue || !currentQueue[currentIndex]) return;
-    const cur = currentQueue[currentIndex];
-    if (curMode === 'words') {
-        playAudioItem('word', cur.word);
-    } else {
-        playAudioItem('text', cur.en);
-    }
-}
-
-function playCurrentSlow() {
-    if (!currentQueue || !currentQueue[currentIndex]) return;
-    const cur = currentQueue[currentIndex];
-    if (curMode === 'words') {
-        playAudioItem('word', cur.word);
-    } else {
-        playAudioItem('text', cur.en);
-    }
-}
-
-function playCurrentPhonicsSlow() {
-    if (!currentQueue || !currentQueue[currentIndex]) return;
-    const cur = currentQueue[currentIndex];
-    if (curMode === 'words') {
-        playAudioItem('phonics', cur.word);
-    } else {
-        playAudioItem('text', cur.en);
-    }
-}
-
-// 供弹窗三连招调用的安全播放函数
-function playComboWord() {
-    if (currentQueue && currentQueue[currentIndex]) {
-        playAudioItem('word', currentQueue[currentIndex].word);
-    }
-}
-function playComboPhrase() {
-    if (currentQueue && currentQueue[currentIndex]) {
-        playAudioItem('text', currentQueue[currentIndex].level2);
-    }
-}
-function playComboSentence() {
-    if (currentQueue && currentQueue[currentIndex]) {
-        playAudioItem('text', curMode === 'words' ? currentQueue[currentIndex].level3 : currentQueue[currentIndex].en);
-    }
-}
-
 function onJudgeResult(isCorrect) {
     const cur = currentQueue[currentIndex];
     if (isCorrect) {
@@ -1430,91 +1839,130 @@ function onJudgeResult(isCorrect) {
         addRewards(15, 5 + comboBonus);
 
         const boss = document.getElementById('boss-emoji');
-        boss.classList.add('shake-hit');
-        setTimeout(() => boss.classList.remove('shake-hit'), 260);
+        if (boss) {
+            boss.classList.add('shake-hit');
+            setTimeout(() => boss.classList.remove('shake-hit'), 260);
+        }
 
-        if (curMode === 'words') {
+        if (curSubject === 'en') {
+            if (curMode === 'words') {
+                openModal(`
+                    <h2 class="modal-title" style="color:var(--primary);">✨ 完美刺中！触发三连招</h2>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:6px;">大声把短语和例句朗读出来！</p>
+                    <div class="combo-content">
+                        <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
+                            <div><strong>🌟 核心词：</strong> <span style="color:var(--primary);font-weight:bold;font-size:15px;">${cur.word}</span></div>
+                            <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboWord()">🔊 读词</button>
+                        </div>
+                        <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
+                            <div><strong>⚡ 常用短语：</strong> ${cur.level2}</div>
+                            <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboPhrase()">🔊 读短语</button>
+                        </div>
+                        <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
+                            <div><strong>🛡️ 课标造句：</strong> ${cur.level3}</div>
+                            <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboSentence()">🔊 读例句</button>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <button class="action-voice-btn" style="margin:0 auto;width:100%;justify-content:center;background:#e0f2fe;color:#0369a1;border-color:#7dd3fc;" onclick="playComboSentence()">🔊 听整句标准发音并跟读</button>
+                    </div>
+                    <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
+                        大声读完了，下一题 ➡️
+                    </button>
+                `);
+                playAudioItem('word', cur.word);
+            } else {
+                openModal(`
+                    <h2 class="modal-title" style="color:var(--primary);">📜 课文一句流利背出！</h2>
+                    <p style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:6px;">脱稿背诵成功！+15 经验值，金币 +${5 + comboBonus}！</p>
+                    <div class="combo-content">
+                        <div class="combo-line"><strong>📖 英文原句：</strong> ${cur.en}</div>
+                        <div class="combo-line"><strong>🎯 对应中文：</strong> ${cur.cn}</div>
+                    </div>
+                    <div style="margin-bottom:12px;">
+                        <button class="action-voice-btn" style="margin:0 auto;width:100%;justify-content:center;" onclick="playComboSentence()">🔊 再次重听标准领读</button>
+                    </div>
+                    <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
+                        下一句继续大声背 ➡️
+                    </button>
+                `);
+                playAudioItem('text', cur.en);
+            }
+        } else if (curSubject === 'math') {
             openModal(`
-                <h2 class="modal-title" style="color:var(--primary);">✨ 完美刺中！触发三连招</h2>
-                <p style="font-size:12px;color:#64748b;margin-bottom:6px;">大声把短语和例句朗读出来！</p>
+                <h2 class="modal-title" style="color:#0284c7;">📐 算理通透！思维暴击</h2>
+                <p style="font-size:12px;color:#0284c7;font-weight:700;margin-bottom:6px;">画图建模成功！+15 经验值，金币 +${5 + comboBonus}！</p>
                 <div class="combo-content">
-                    <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
-                        <div><strong>🌟 核心词：</strong> <span style="color:var(--primary);font-weight:bold;font-size:15px;">${cur.word}</span></div>
-                        <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboWord()">🔊 读词</button>
-                    </div>
-                    <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
-                        <div><strong>⚡ 常用短语：</strong> ${cur.level2}</div>
-                        <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboPhrase()">🔊 读短语</button>
-                    </div>
-                    <div class="combo-line" style="display:flex;justify-content:space-between;align-items:center;">
-                        <div><strong>🛡️ 课标造句：</strong> ${cur.level3}</div>
-                        <button class="action-voice-btn" style="padding:3px 8px;font-size:11px;" onclick="playComboSentence()">🔊 读例句</button>
-                    </div>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <button class="action-voice-btn" style="margin:0 auto;width:100%;justify-content:center;background:#e0f2fe;color:#0369a1;border-color:#7dd3fc;" onclick="playComboSentence()">🔊 听整句标准发音并跟读</button>
+                    <div class="combo-line"><strong>🎯 正确算式：</strong> <span style="color:#0284c7;font-weight:bold;">${cur.answerText}</span></div>
+                    <div class="combo-line" style="font-size:11px;color:#1e40af;"><strong>💡 算理解读：</strong> ${cur.logicReasoning}</div>
+                    <div class="combo-line" style="font-size:11px;color:#854d0e;"><strong>✨ 变式小招：</strong> ${cur.variantRule}</div>
                 </div>
                 <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
-                    大声读完了，下一题 ➡️
+                    算理吃透了，下一题 ➡️
                 </button>
             `);
-            speakWordStandard(cur.level3);
-        } else {
-            // 课文背诵成功弹窗
+        } else if (curSubject === 'cn') {
             openModal(`
-                <h2 class="modal-title" style="color:var(--primary);">📜 课文一句流利背出！</h2>
-                <p style="font-size:12px;color:#16a34a;font-weight:700;margin-bottom:6px;">背诵语感极佳！+15 经验值，金币 +${5 + comboBonus}！</p>
+                <h2 class="modal-title" style="color:#b45309;">📖 形义通透！素养暴击</h2>
+                <p style="font-size:12px;color:#b45309;font-weight:700;margin-bottom:6px;">字理形义把握精准！+15 经验值，金币 +${5 + comboBonus}！</p>
                 <div class="combo-content">
-                    <div class="combo-line"><strong>📖 英文：</strong> ${cur.en}</div>
-                    <div class="combo-line"><strong>🎯 中文：</strong> ${cur.cn}</div>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <button class="action-voice-btn" style="margin:0 auto;width:100%;justify-content:center;" onclick="playComboSentence()">🔊 再次重听标准领读</button>
+                    <div class="combo-line"><strong>🎯 核心正解：</strong> <span style="color:#b45309;font-weight:bold;">${cur.answerText}</span></div>
+                    <div class="combo-line" style="font-size:11px;color:#166534;"><strong>💡 字源形义：</strong> ${cur.cnSource}</div>
+                    <div class="combo-line" style="font-size:11px;color:#854d0e;"><strong>✨ 经典美句：</strong> ${cur.variantRule}</div>
                 </div>
                 <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
-                    下一句继续大声背 ➡️
+                    深刻记住了，下一题 ➡️
                 </button>
             `);
-            speakWordStandard(cur.en);
         }
     } else {
         userData.combo = 0;
         updatePlayerBar();
         currentMistakesThisRound.push(cur);
 
-        if (curMode === 'words') {
-            if (!userData.mistakes.find(m => m.word === cur.word)) {
-                userData.mistakes.push(cur);
-                saveUserData();
-            }
+        // 统一加入错题背包
+        const mKey = cur.word || cur.answerText || cur.en;
+        if (!userData.mistakes.find(m => (m.word || m.answerText || m.en) === mKey)) {
+            userData.mistakes.push({ ...cur, subject: curSubject });
+            saveUserData();
+        }
+
+        if (curSubject === 'en') {
             openModal(`
-                <h2 class="modal-title" style="color:var(--danger);">⚠️ 攻击被格挡！</h2>
-                <p style="font-size:12px;color:#64748b;">已收录进错题猎人背包。</p>
+                <h2 class="modal-title" style="color:var(--danger);">⚠️ 攻击遭遇格挡！</h2>
+                <p style="font-size:12px;color:#64748b;margin-bottom:6px;">已打包进【🎒 错题升级经验背包】。失误即经验！</p>
                 <div class="combo-content">
-                    <div class="combo-line" style="color:#b91c1c;"><strong>🎯 破绽点：</strong> ${cur.trapRule}</div>
-                    <div class="combo-line"><strong>💡 杨妈拼读点：</strong> ${cur.vowelRule}</div>
+                    <div class="combo-line" style="color:#b91c1c;"><strong>🎯 破绽点：</strong> ${cur.trapRule || '需加强自然拼读记忆'}</div>
+                    <div class="combo-line"><strong>💡 记忆点：</strong> ${cur.vowelRule || cur.chunkRule || '大声多读两遍强化肌肉记忆'}</div>
                 </div>
                 <button class="btn-large btn-wrong" onclick="closeModal(); currentIndex++; renderQuestion();">
                     看清弱点，下一题 ➡️
                 </button>
             `);
-        } else {
-            // 课文背诵卡壳弹窗：重在引导跟读与强化记忆
+        } else if (curSubject === 'math') {
             openModal(`
-                <h2 class="modal-title" style="color:var(--warning);">⚠️ 这一句卡壳了，没关系！</h2>
-                <p style="font-size:12px;color:#64748b;">跟着标准原声大声读两遍，待会儿复习挑战。</p>
+                <h2 class="modal-title" style="color:var(--danger);">⚠️ 算理遭遇卡壳！</h2>
+                <p style="font-size:12px;color:#64748b;margin-bottom:6px;">已打包进【🎒 错题升级经验背包】。去背包复仇可得双倍经验！</p>
                 <div class="combo-content">
-                    <div class="combo-line"><strong>📖 英文原句：</strong> ${cur.en}</div>
-                    <div class="combo-line"><strong>🎯 中文释义：</strong> ${cur.cn}</div>
-                </div>
-                <div style="margin-bottom:12px;">
-                    <button class="action-voice-btn" style="margin:0 auto;" onclick="playComboSentence()">🔊 跟着原声读一遍</button>
+                    <div class="combo-line" style="color:#b91c1c;"><strong>⚠️ 常见坍缩破绽：</strong> ${cur.trapRule}</div>
+                    <div class="combo-line" style="font-size:11px;color:#1e40af;"><strong>💡 算理关键点：</strong> ${cur.logicReasoning}</div>
                 </div>
                 <button class="btn-large btn-wrong" onclick="closeModal(); currentIndex++; renderQuestion();">
-                    记在脑海中，下一句 ➡️
+                    领悟算理，下一题 ➡️
                 </button>
             `);
-            speakWordStandard(cur.en);
+        } else if (curSubject === 'cn') {
+            openModal(`
+                <h2 class="modal-title" style="color:var(--danger);">⚠️ 笔画或背诵受阻！</h2>
+                <p style="font-size:12px;color:#64748b;margin-bottom:6px;">已打包进【🎒 错题升级经验背包】。搞懂偏旁字源永不再错！</p>
+                <div class="combo-content">
+                    <div class="combo-line" style="color:#b91c1c;"><strong>⚠️ 易错防坑口诀：</strong> ${cur.trapRule}</div>
+                    <div class="combo-line" style="font-size:11px;color:#166534;"><strong>💡 字形规律：</strong> ${cur.cnSource}</div>
+                </div>
+                <button class="btn-large btn-wrong" onclick="closeModal(); currentIndex++; renderQuestion();">
+                    看清字理，下一题 ➡️
+                </button>
+            `);
         }
     }
 }
@@ -1563,21 +2011,25 @@ function openMistakeBag() {
     if (userData.mistakes.length === 0) {
         return alert('🎒 你的错题本空空如也，太厉害了！');
     }
-    const listHtml = userData.mistakes.map((m, idx) => `
-        <div style="text-align:left;padding:8px;border-bottom:1px solid #eee;font-size:12px;">
-            <strong style="color:var(--primary);">${idx+1}. ${m.word}</strong> (${m.meaning})<br>
-            <span style="color:#e11d48;">弱点：${m.trapRule}</span>
-        </div>
-    `).join('');
+    const listHtml = userData.mistakes.map((m, idx) => {
+        const title = m.word ? `🔤 ${m.word} (${m.meaning})` : (m.answerText ? `🔢 ${m.title}: ${m.answerText}` : `📖 ${m.en}`);
+        const trap = m.trapRule || '多加复习';
+        return `
+            <div style="text-align:left;padding:8px;border-bottom:1px solid #eee;font-size:12px;">
+                <strong style="color:var(--primary);">${idx+1}. ${title}</strong><br>
+                <span style="color:#e11d48;font-size:11px;">⚠️ 核心弱点：${trap}</span>
+            </div>
+        `;
+    }).join('');
 
     openModal(`
-        <h2 class="modal-title">🎒 错题猎人背包</h2>
+        <h2 class="modal-title">🎒 错题升级经验背包</h2>
+        <p style="font-size:12px;color:#64748b;margin-bottom:6px;">《让学习像游戏一样上瘾》原则：错题是珍贵的升级经验包！</p>
         <div style="max-height:260px;overflow-y:auto;margin:10px 0;">${listHtml}</div>
-        <button class="btn-large btn-correct" onclick="startMistakeChallenge()">⚔️ 针对错题集中复仇清剿</button>
+        <button class="btn-large btn-correct" onclick="startMistakeChallenge()">⚔️ 错题大复仇 (成功得双倍暴击经验)</button>
         <button class="action-voice-btn" style="width:100%;margin-top:8px;justify-content:center;" onclick="closeModal()">关闭</button>
     `);
 }
-
 function startMistakeChallenge() {
     closeModal();
     curMode = 'words';
