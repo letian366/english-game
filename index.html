@@ -617,6 +617,297 @@
             font-size: 13px;
         }
         .combo-line { margin-bottom: 6px; line-height: 1.4; }
+    
+        /* ==================== 认知科学升级：题干卡片、小老师讲台与记忆罗盘 ==================== */
+        .feynman-btn-hub {
+            display: flex;
+            gap: 10px;
+            margin: 12px 0 16px;
+            width: 100%;
+        }
+        .hub-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: none;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        .hub-btn:active { transform: scale(0.96); }
+        .hub-btn-feynman {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: 1px solid #fef3c7;
+        }
+        .hub-btn-memory {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            border: 1px solid #e0e7ff;
+        }
+
+        /* 战斗挑战卡 (Combat Challenge Card) */
+        .challenge-card-pro {
+            background: #ffffff;
+            border-radius: 18px;
+            padding: 18px 16px;
+            margin: 10px 0 14px;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.07);
+            border: 2px solid #e2e8f0;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+        .challenge-card-pro::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
+        }
+        .card-meta-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .card-badge-dim {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid #bfdbfe;
+        }
+        .card-badge-retrieval {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid #fecaca;
+        }
+        .challenge-title-text {
+            font-size: 17px;
+            font-weight: 900;
+            color: #0f172a;
+            line-height: 1.45;
+            margin-bottom: 10px;
+        }
+        .challenge-question-body {
+            font-size: 15px;
+            font-weight: 600;
+            color: #334155;
+            line-height: 1.6;
+            background: #f8fafc;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            white-space: pre-line;
+        }
+        .challenge-question-body strong {
+            color: #1e3a8a;
+            background: #dbeafe;
+            padding: 1px 4px;
+            border-radius: 4px;
+        }
+
+        /* 概念微诊断与交互阶梯 (Interactive Scaffolding) */
+        .scaffold-box {
+            margin-top: 14px;
+            background: #faf5ff;
+            border: 1px solid #f3e8ff;
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .scaffold-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-weight: 800;
+            color: #7e22ce;
+            margin-bottom: 8px;
+        }
+        .scaffold-options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .scaffold-opt-btn {
+            background: #ffffff;
+            border: 1.5px solid #e9d5ff;
+            border-radius: 10px;
+            padding: 9px 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #3b0764;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            line-height: 1.4;
+            transition: all 0.15s;
+        }
+        .scaffold-opt-btn:active { transform: scale(0.98); }
+        .scaffold-opt-btn.correct-opt {
+            border-color: #10b981;
+            background: #ecfdf5;
+            color: #065f46;
+            font-weight: 700;
+        }
+        .scaffold-opt-btn.trap-opt {
+            border-color: #f87171;
+            background: #fef2f2;
+            color: #991b1b;
+        }
+        .scaffold-feedback-toast {
+            margin-top: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.45;
+            font-weight: 700;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        /* 小老师费曼录讲台组件 */
+        .feynman-studio-card {
+            text-align: left;
+        }
+        .feynman-step-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0 16px;
+        }
+        .feynman-step-pill {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .feynman-step-tag {
+            background: #d97706;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        .recorder-console {
+            background: #0f172a;
+            color: #fff;
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+            margin: 14px 0;
+        }
+        .record-timer {
+            font-size: 28px;
+            font-weight: 900;
+            font-family: monospace;
+            color: #38bdf8;
+            margin: 8px 0;
+        }
+        .wave-container {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin: 8px 0 12px;
+        }
+        .wave-bar {
+            width: 4px;
+            height: 8px;
+            background: #38bdf8;
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+        .recording-active .wave-bar {
+            animation: waveBounce 0.6s infinite ease-in-out alternate;
+        }
+        .recording-active .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .recording-active .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        .recording-active .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+        .recording-active .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+        .recording-active .wave-bar:nth-child(6) { animation-delay: 0.2s; }
+        .recording-active .wave-bar:nth-child(7) { animation-delay: 0.1s; }
+        @keyframes waveBounce {
+            0% { height: 6px; opacity: 0.4; }
+            100% { height: 28px; opacity: 1; background: #f43f5e; }
+        }
+        .rec-ctrl-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-start-rec {
+            background: #ef4444;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.4);
+        }
+        .btn-stop-rec {
+            background: #10b981;
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+        }
+
+        /* 记忆银行与遗忘曲线弹窗 */
+        .memory-dashboard {
+            text-align: left;
+        }
+        .curve-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 12px 0 16px;
+        }
+        .curve-col {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 6px;
+            text-align: center;
+        }
+        .curve-day { font-size: 11px; font-weight: 800; color: #64748b; }
+        .curve-count { font-size: 18px; font-weight: 900; color: #0284c7; margin: 4px 0; }
+        .curve-label { font-size: 10px; color: #94a3b8; }
+        .curve-col.active-today {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+        .curve-col.active-today .curve-count { color: #dc2626; }
+
     </style>
 </head>
 <body>
@@ -656,7 +947,18 @@
             <button class="subject-btn cn" id="sub-btn-cn" onclick="setSubject('cn')">📖 语文圣域</button>
         </div>
     
-        <div class="hero-banner">
+        
+            <!-- 认知科学两大超级引擎入口 (基于四本书理论：小老师费曼输出 + 艾宾浩斯记忆罗盘) -->
+            <div class="feynman-btn-hub">
+                <button class="hub-btn hub-btn-feynman" onclick="openFeynmanStudio()">
+                    🎤 小老师费曼讲台
+                </button>
+                <button class="hub-btn hub-btn-memory" onclick="openMemoryCompass()">
+                    🧠 记忆守护罗盘
+                </button>
+            </div>
+
+            <div class="hero-banner">
                 <span class="edition-tag">✨ 2026秋最新版 · 义务教育新课标教材</span>
                 <h1 id="hero-title">⚔️ 人教版语数英打怪战 · 四年级上</h1>
                 <p>听音能写 · 见词能读 · 课文背诵攻擂</p>
@@ -687,6 +989,7 @@
             <div class="game-nav">
                 <button class="nav-btn" onclick="returnToHome()">🏠</button>
                 <div style="display:flex;align-items:center;gap:6px;"><div class="stage-title" id="stage-title-text">Unit 1 挑战中</div><div class="flow-timer" id="flow-timer">⏱️ 10:00</div></div>
+                <button class="hunter-btn" style="background:#fef3c7;color:#b45309;border-color:#fde047;font-weight:800;" onclick="openFeynmanForCurrent()">🎤 讲此题 (+50 EXP)</button>
                 <button class="hunter-btn" onclick="openMistakeBag()">🎒 错题本 (<span id="mistake-badge">0</span>)</button>
             </div>
 
@@ -699,8 +1002,29 @@
 
             <!-- 舞台内容区 -->
             <div class="stage-scroll">
-                <div class="prompt-tag" id="prompt-tag-text">✏️ 请在草稿纸上拼写默出：</div>
-                <div class="chinese-meaning" id="main-prompt-text">医生</div>
+                <!-- 现代化战斗诊断题卡 (Combat Challenge Card) -->
+                <div class="challenge-card-pro" id="challenge-card-box">
+                    <div class="card-meta-row">
+                        <div class="card-badge-dim" id="challenge-dim-tag">📐 核心模型构建</div>
+                        <div class="card-badge-retrieval" id="challenge-curve-tag">⚡ 艾宾浩斯提取中</div>
+                    </div>
+                    <div class="challenge-title-text" id="challenge-title-text">Unit 1 核心算理攻坚</div>
+                    <div class="challenge-question-body" id="challenge-body-text">题干加载中...</div>
+
+                    <!-- 概念微诊断阶梯 (可点选辨析，避免无从下手) -->
+                    <div class="scaffold-box" id="scaffold-box-area" style="display:none;">
+                        <div class="scaffold-header">
+                            <span>🎯 概念微诊断（点击排查陷阱）：</span>
+                            <span style="font-size:10px;color:#a855f7;">轻点排查</span>
+                        </div>
+                        <div class="scaffold-options-list" id="scaffold-options-list"></div>
+                        <div class="scaffold-feedback-toast" id="scaffold-feedback-toast"></div>
+                    </div>
+                </div>
+
+                <!-- 英语原有纯单词展示标签 (兼容原有逻辑) -->
+                <div id="main-prompt-text" style="display:none;"></div>
+                <div id="prompt-tag-text" style="display:none;"></div>
 
                 <!-- 听音与提示工具区 -->
                 <div class="pre-listen-box" id="pre-listen-area">
@@ -808,6 +1132,348 @@
     </div>
 
 <script>
+
+/* ==================== 认知科学升级：艾宾浩斯遗忘曲线引擎 (Make It Stick) ==================== */
+const MEMORY_KEY = 'rocky_memory_vault_v1';
+let memoryVault = JSON.parse(localStorage.getItem(MEMORY_KEY) || '{}');
+
+function saveMemoryVault() {
+    localStorage.setItem(MEMORY_KEY, JSON.stringify(memoryVault));
+}
+
+// 记录做题结果到艾宾浩斯记忆库
+function recordMemoryAttempt(itemKey, isCorrect, subject, title) {
+    const now = Date.now();
+    const oneDay = 24 * 60 * 60 * 1000;
+    if (!memoryVault[itemKey]) {
+        memoryVault[itemKey] = {
+            id: itemKey,
+            title: title || itemKey,
+            subject: subject,
+            stage: 0, // 0:当天, 1:Day1, 2:Day4, 3:Day7, 4:永久掌握
+            nextReviewTime: now,
+            reviewCount: 0,
+            mistakeCount: 0,
+            lastReviewed: now
+        };
+    }
+    const mem = memoryVault[itemKey];
+    mem.lastReviewed = now;
+    if (isCorrect) {
+        mem.reviewCount++;
+        if (mem.stage === 0) {
+            mem.stage = 1;
+            mem.nextReviewTime = now + oneDay; // 次日复习
+        } else if (mem.stage === 1) {
+            mem.stage = 2;
+            mem.nextReviewTime = now + 3 * oneDay; // 3天后(第4天)复习
+        } else if (mem.stage === 2) {
+            mem.stage = 3;
+            mem.nextReviewTime = now + 3 * oneDay; // 3天后(第7天)复习
+        } else if (mem.stage === 3) {
+            mem.stage = 4; // 达成永久掌握
+            mem.nextReviewTime = 0;
+        }
+    } else {
+        mem.mistakeCount++;
+        mem.stage = 0; // 跌回当天未掌握复仇池
+        mem.nextReviewTime = now;
+    }
+    saveMemoryVault();
+}
+
+// 打开艾宾浩斯记忆罗盘
+function openMemoryCompass() {
+    const now = Date.now();
+    let stage0Count = 0;
+    let stage1Count = 0;
+    let stage2Count = 0;
+    let stage3Count = 0;
+    let permanentCount = 0;
+    let dueReviewItems = [];
+
+    Object.values(memoryVault).forEach(m => {
+        if (m.stage === 4) {
+            permanentCount++;
+        } else if (m.stage === 3) {
+            stage3Count++;
+            if (m.nextReviewTime <= now) dueReviewItems.push(m);
+        } else if (m.stage === 2) {
+            stage2Count++;
+            if (m.nextReviewTime <= now) dueReviewItems.push(m);
+        } else if (m.stage === 1) {
+            stage1Count++;
+            if (m.nextReviewTime <= now) dueReviewItems.push(m);
+        } else {
+            stage0Count++;
+            dueReviewItems.push(m);
+        }
+    });
+
+    const totalCount = Object.keys(memoryVault).length || 1;
+    const masteryRate = Math.round((permanentCount / totalCount) * 100);
+
+    let dueListHtml = '';
+    if (dueReviewItems.length === 0) {
+        dueListHtml = '<div style="font-size:12px;color:#16a34a;padding:12px;background:#f0fdf4;border-radius:10px;text-align:center;">🎉 太赞了！当前没有临界遗忘怪，所有知识都在安全稳固期！</div>';
+    } else {
+        dueListHtml = dueReviewItems.slice(0, 6).map(m => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-bottom:1px dashed #e2e8f0;font-size:12px;">
+                <span style="font-weight:700;color:#0f172a;">${m.title}</span>
+                <span style="font-size:10px;background:#fee2e2;color:#b91c1c;padding:2px 6px;border-radius:4px;">需提取复习</span>
+            </div>
+        `).join('');
+    }
+
+    showModal(`
+        <div class="memory-dashboard">
+            <div style="font-size:18px;font-weight:900;color:#1e1b4b;display:flex;align-items:center;gap:6px;">
+                🧠 艾宾浩斯记忆守护罗盘
+            </div>
+            <div style="font-size:12px;color:#64748b;margin:4px 0 12px;">基于《认知天性》：在即将遗忘的临界点提取，记忆才最牢固！</div>
+
+            <div style="background:#f1f5f9;border-radius:12px;padding:12px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:800;color:#334155;margin-bottom:6px;">
+                    <span>🏆 永久牢固掌握度</span>
+                    <span style="color:#0284c7;">${masteryRate}%</span>
+                </div>
+                <div style="height:10px;background:#e2e8f0;border-radius:5px;overflow:hidden;">
+                    <div style="height:100%;width:${masteryRate}%;background:linear-gradient(90deg,#0284c7,#10b981);border-radius:5px;"></div>
+                </div>
+            </div>
+
+            <div class="curve-grid">
+                <div class="curve-col ${dueReviewItems.length > 0 ? 'active-today' : ''}">
+                    <div class="curve-day">Day 0/1</div>
+                    <div class="curve-count">${stage0Count + stage1Count}</div>
+                    <div class="curve-label">即时/次日</div>
+                </div>
+                <div class="curve-col">
+                    <div class="curve-day">Day 4</div>
+                    <div class="curve-count">${stage2Count}</div>
+                    <div class="curve-label">中程穿插</div>
+                </div>
+                <div class="curve-col">
+                    <div class="curve-day">Day 7</div>
+                    <div class="curve-count">${stage3Count}</div>
+                    <div class="curve-label">关底验核</div>
+                </div>
+                <div class="curve-col" style="background:#f0fdf4;border-color:#bbf7d0;">
+                    <div class="curve-day" style="color:#166534;">永久</div>
+                    <div class="curve-count" style="color:#16a34a;">${permanentCount}</div>
+                    <div class="curve-label" style="color:#15803d;">刻入长时</div>
+                </div>
+            </div>
+
+            <div style="font-size:13px;font-weight:800;color:#0f172a;margin:12px 0 6px;">⚡ 今日到达遗忘临界点的知识点 (${dueReviewItems.length}):</div>
+            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;max-height:160px;overflow-y:auto;">
+                ${dueListHtml}
+            </div>
+
+            <button class="btn-large" style="margin-top:16px;" onclick="closeModal()">明白了，保持每天打卡</button>
+        </div>
+    `);
+}
+
+
+/* ==================== 认知科学升级：小老师费曼错题讲台 (生成与反思) ==================== */
+let feynmanMediaRecorder = null;
+let feynmanAudioChunks = [];
+let feynmanTimerInterval = null;
+let feynmanRecordSeconds = 0;
+let feynmanLastAudioUrl = null;
+
+// 打开小老师讲台
+function openFeynmanStudio(presetTitle, presetQuestion, presetHint) {
+    const defaultTitle = presetTitle || (currentQueue[currentIndex] ? (currentQueue[currentIndex].title || currentQueue[currentIndex].meaning || currentQueue[currentIndex].word) : '学校今日数学/英语错题');
+    const defaultQ = presetQuestion || (currentQueue[currentIndex] ? (currentQueue[currentIndex].question || currentQueue[currentIndex].cn || '') : '');
+
+    showModal(`
+        <div class="feynman-studio-card">
+            <div style="font-size:18px;font-weight:900;color:#b45309;display:flex;align-items:center;gap:6px;">
+                🎤 小老师费曼错题讲台
+            </div>
+            <div style="font-size:11px;color:#64748b;margin:4px 0 10px;">
+                《学习观》：<strong>能把别人讲懂，才是真正学会！</strong> 讲一次 = 提分一重天！
+            </div>
+
+            <!-- 讲题任务卡 -->
+            <div style="background:#fffbeb;border:1.5px solid #fef08a;border-radius:12px;padding:10px;margin-bottom:12px;">
+                <div style="font-size:11px;font-weight:800;color:#b45309;margin-bottom:4px;">🎯 当前讲解攻坚题：</div>
+                <input type="text" id="feynman-input-title" value="${defaultTitle}" style="width:100%;border:1px solid #fde047;border-radius:6px;padding:6px 8px;font-size:13px;font-weight:700;color:#0f172a;margin-bottom:6px;box-sizing:border-box;" placeholder="输入错题题目...">
+                <textarea id="feynman-input-body" style="width:100%;height:50px;border:1px solid #fde047;border-radius:6px;padding:6px 8px;font-size:12px;color:#334155;box-sizing:border-box;resize:none;" placeholder="输入错题详细情境或算式...">${defaultQ}</textarea>
+            </div>
+
+            <!-- 三步脚手架引导 -->
+            <div class="feynman-step-flow">
+                <div class="feynman-step-pill">
+                    <span class="feynman-step-tag">第一步 · 抓破绽</span>
+                    <span>我当时错在哪？是看错单位还是没理清题意？</span>
+                </div>
+                <div class="feynman-step-pill">
+                    <span class="feynman-step-tag">第二步 · 亮大招</span>
+                    <span>这道题背后真正考的是哪个核心公式与模型？</span>
+                </div>
+                <div class="feynman-step-pill">
+                    <span class="feynman-step-tag">第三步 · 破变式</span>
+                    <span>如果换个数字，怎么用一招秒杀破局？</span>
+                </div>
+            </div>
+
+            <!-- 录音机控制台 -->
+            <div class="recorder-console" id="recorder-console-box">
+                <div style="font-size:11px;color:#94a3b8;">🎙️ 录制小名师原声带 (建议讲 30~60 秒)</div>
+                <div class="record-timer" id="feynman-rec-timer">00:00</div>
+                <div class="wave-container" id="wave-bars-box">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+
+                <div id="rec-actions-bar">
+                    <button class="rec-ctrl-btn btn-start-rec" id="btn-feynman-rec" onclick="startFeynmanRecording()">
+                        🔴 开始名师讲题
+                    </button>
+                </div>
+
+                <!-- 录音回放区 -->
+                <div id="feynman-playback-area" style="display:none;margin-top:12px;">
+                    <audio id="feynman-playback-audio" controls style="width:100%;height:36px;"></audio>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button class="btn-large" style="flex:1;background:#e2e8f0;color:#334155;" onclick="closeFeynmanStudio()">先不讲了</button>
+                <button class="btn-large" style="flex:2;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;" id="btn-save-lecture" onclick="submitFeynmanLecture()">
+                    🎉 讲完打卡 (+50 EXP)
+                </button>
+            </div>
+        </div>
+    `);
+}
+
+// 打开当前正在做的这道题的讲题弹窗
+function openFeynmanForCurrent() {
+    if (!currentQueue || currentQueue.length === 0 || !currentQueue[currentIndex]) {
+        return openFeynmanStudio();
+    }
+    const cur = currentQueue[currentIndex];
+    const t = cur.title || cur.meaning || cur.word;
+    const q = cur.question || cur.cn || cur.meaning || '';
+    const h = cur.hint || cur.trapRule || '';
+    openFeynmanStudio(t, q, h);
+}
+
+// 启动录音
+async function startFeynmanRecording() {
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        feynmanAudioChunks = [];
+        feynmanMediaRecorder = new MediaRecorder(stream);
+        
+        feynmanMediaRecorder.ondataavailable = (e) => {
+            if (e.data.size > 0) feynmanAudioChunks.push(e.data);
+        };
+
+        feynmanMediaRecorder.onstop = () => {
+            const audioBlob = new Blob(feynmanAudioChunks, { type: 'audio/webm' });
+            feynmanLastAudioUrl = URL.createObjectURL(audioBlob);
+            const player = document.getElementById('feynman-playback-audio');
+            if (player) {
+                player.src = feynmanLastAudioUrl;
+                document.getElementById('feynman-playback-area').style.display = 'block';
+            }
+            // 停止麦克风占用
+            stream.getTracks().forEach(track => track.stop());
+        };
+
+        feynmanMediaRecorder.start();
+        feynmanRecordSeconds = 0;
+        document.getElementById('wave-bars-box').classList.add('recording-active');
+        
+        const btn = document.getElementById('btn-feynman-rec');
+        btn.className = 'rec-ctrl-btn btn-stop-rec';
+        btn.innerHTML = '⏹️ 讲完了，完成录制';
+        btn.onclick = stopFeynmanRecording;
+
+        if (feynmanTimerInterval) clearInterval(feynmanTimerInterval);
+        feynmanTimerInterval = setInterval(() => {
+            feynmanRecordSeconds++;
+            const m = String(Math.floor(feynmanRecordSeconds / 60)).padStart(2, '0');
+            const s = String(feynmanRecordSeconds % 60).padStart(2, '0');
+            const timerEl = document.getElementById('feynman-rec-timer');
+            if (timerEl) timerEl.innerText = m + ':' + s;
+        }, 1000);
+
+    } catch (err) {
+        alert('⚠️ 无法启动麦克风。请确保在浏览器中允许了麦克风权限！可以直接大声讲给家长听，讲完直接点击【讲完打卡】哦！');
+    }
+}
+
+// 停止录音
+function stopFeynmanRecording() {
+    if (feynmanMediaRecorder && feynmanMediaRecorder.state !== 'inactive') {
+        feynmanMediaRecorder.stop();
+    }
+    if (feynmanTimerInterval) clearInterval(feynmanTimerInterval);
+    const box = document.getElementById('wave-bars-box');
+    if (box) box.classList.remove('recording-active');
+    
+    const btn = document.getElementById('btn-feynman-rec');
+    if (btn) {
+        btn.className = 'rec-ctrl-btn btn-start-rec';
+        btn.innerHTML = '🔄 重新录一遍';
+        btn.onclick = startFeynmanRecording;
+    }
+}
+
+// 提交费曼讲题成果
+function submitFeynmanLecture() {
+    stopFeynmanRecording();
+    const title = document.getElementById('feynman-input-title').value || '今日攻坚错题';
+    
+    // 巨额奖励 +50 EXP
+    addRewards(50, 25);
+    userData.coins += 15;
+    saveUserData();
+    updatePlayerBar();
+
+    // 记录到本地
+    const lectureRecords = JSON.parse(localStorage.getItem('feynman_records') || '[]');
+    lectureRecords.unshift({
+        title: title,
+        time: new Date().toLocaleDateString(),
+        duration: feynmanRecordSeconds
+    });
+    localStorage.setItem('feynman_records', JSON.stringify(lectureRecords.slice(0, 20)));
+
+    closeModal();
+    showModal(`
+        <div style="text-align:center;padding:12px;">
+            <div style="font-size:44px;margin-bottom:8px;">🏅</div>
+            <div style="font-size:20px;font-weight:900;color:#b45309;">真棒！费曼小名师出关！</div>
+            <div style="font-size:13px;color:#475569;margin:8px 0 14px;line-height:1.5;">
+                你用自己的语言把这道题彻底讲透了！<br>
+                根据认知科学，你的神经联结已<strong>永久固化</strong>！
+            </div>
+            <div style="background:#fef3c7;border:1px solid #fde047;border-radius:10px;padding:10px;font-size:14px;font-weight:800;color:#92400e;margin-bottom:16px;">
+                🎉 经验值 +50 EXP · 金币 +15 🪙<br>
+                解锁【荣耀小名师】特权加成！
+            </div>
+            <button class="btn-large" onclick="closeModal()">收下经验，继续通关</button>
+        </div>
+    `);
+}
+
+function closeFeynmanStudio() {
+    stopFeynmanRecording();
+    closeModal();
+}
+
 /* ==================== 1. 本地存储、换装与用户成长系统 ==================== */
 const USER_KEY = 'rocky_pep_english_v3';
 
@@ -2630,48 +3296,132 @@ function renderQuestion() {
     const btnCorrect = document.getElementById('btn-judge-correct');
     const preListenArea = document.getElementById('pre-listen-area');
 
+    const dimTag = document.getElementById('challenge-dim-tag');
+    const curveTag = document.getElementById('challenge-curve-tag');
+    const titleText = document.getElementById('challenge-title-text');
+    const bodyText = document.getElementById('challenge-body-text');
+    const scaffoldArea = document.getElementById('scaffold-box-area');
+    const scaffoldList = document.getElementById('scaffold-options-list');
+    const scaffoldFeedback = document.getElementById('scaffold-feedback-toast');
+
+    scaffoldFeedback.style.display = 'none';
+    scaffoldFeedback.innerHTML = '';
+
     if (curSubject === 'en') {
         preListenArea.style.display = 'flex';
         if (curMode === 'words') {
-            document.getElementById('prompt-tag-text').innerText = '✏️ 请在草稿纸上拼写默出：';
-            document.getElementById('main-prompt-text').innerText = cur.meaning;
+            dimTag.innerText = '🔤 自然拼读 · 听音默写';
+            curveTag.innerText = '⚡ 肌肉记忆构建';
+            titleText.innerText = '✏️ 请在草稿纸上拼出该单词：';
+            bodyText.innerHTML = `<div style="font-size:26px;font-weight:900;color:#1e3a8a;text-align:center;padding:10px 0;">${cur.meaning}</div>`;
+
             btnPhonics.style.display = 'inline-flex';
             btnPhonics.innerHTML = '👂 听杨妈拆音拼读';
             btnStandard.innerHTML = '🔊 标准读音';
             btnShowAnswer.innerText = '👀 纸上默写好了，对答案';
             btnWrong.innerText = '❌ 拼错了';
             btnCorrect.innerText = '🗡️ 刺中！拼对了 (触发三连招)';
+
+            // 微诊断阶梯
+            scaffoldArea.style.display = 'block';
+            scaffoldList.innerHTML = `
+                <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('💡 核心音节提示：本词包含 ${cur.syllables ? cur.syllables.length : 1} 个音块，先听清辅音再抓元音！')">
+                    <span>🧩</span><span>点此排查：这个单词由哪几个音块组成？</span>
+                </button>
+                <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('⚠️ 避坑防线：${cur.trapRule || '注意结尾辅音和元音字母组合！'}')">
+                    <span>⚠️</span><span>点此排查：最容易丢分的破绽坑在哪里？</span>
+                </button>
+            `;
         } else {
-            document.getElementById('prompt-tag-text').innerText = '🗣️ 看着中文意思，请大声背诵出英文原句：';
-            document.getElementById('main-prompt-text').innerText = cur.cn;
+            dimTag.innerText = '📜 语境背诵 · 句型总脑图';
+            curveTag.innerText = '⚡ 语言模型提取';
+            titleText.innerText = '🗣️ 看着中文意思，请大声脱稿背诵英文原句：';
+            bodyText.innerHTML = `<div style="font-size:17px;font-weight:700;color:#0f172a;line-height:1.6;">${cur.cn}</div>`;
+
             btnPhonics.style.display = 'inline-flex';
             btnPhonics.innerHTML = '👂 想不起来？听原声提示';
             btnStandard.innerHTML = '🐢 慢速领读一遍';
             btnShowAnswer.innerText = '🗣️ 我大声背完了，对答案';
             btnWrong.innerText = '⚠️ 还不熟练 / 卡壳了';
             btnCorrect.innerText = '🗡️ 流利背出！刺击魔物';
+
+            scaffoldArea.style.display = 'block';
+            scaffoldList.innerHTML = `
+                <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('💡 句型定位：想一想本句是“状态型(系表状)”还是“动作型(主谓宾状)”？主语是谁？')">
+                    <span>📐</span><span>点此排查：根据五大基本句型，本句的核心主谓结构是什么？</span>
+                </button>
+            `;
         }
     } else if (curSubject === 'math') {
         preListenArea.style.display = 'flex';
         btnPhonics.style.display = 'none';
         btnStandard.innerHTML = '💡 思考提示';
         btnStandard.onclick = function() {
-            alert('💡 破局思路提示：\n\n' + cur.hint);
+            triggerScaffoldHint('💡 破局思路提示：\n\n' + cur.hint);
         };
-        document.getElementById('prompt-tag-text').innerText = '📐 请在草稿纸上画图建模与列式计算：';
-        document.getElementById('main-prompt-text').innerText = cur.title + '\n\n' + cur.question;
-        btnShowAnswer.innerText = '👀 纸上推导好了，核对算理';
+
+        dimTag.innerText = '🔢 算理建模与数量关系';
+        curveTag.innerText = '⚡ 认知天性提取测验';
+        titleText.innerText = cur.title;
+        
+        // 格式化呈现数学题干
+        let formattedQ = cur.question.replace(/\\n/g, '<br>').replace(/(\d+\.)/g, '<strong style="color:#0284c7;">$1</strong>');
+        bodyText.innerHTML = `
+            <div style="font-size:14px;color:#1e293b;line-height:1.7;">${formattedQ}</div>
+        `;
+
+        btnShowAnswer.innerText = '👀 纸上画图推导完毕，核对算理';
         btnWrong.innerText = '❌ 算理有漏洞 / 算错了';
         btnCorrect.innerText = '🗡️ 算理通透！准确刺击魔物';
+
+        // 动态生成数学针对性微诊断交互
+        scaffoldArea.style.display = 'block';
+        scaffoldList.innerHTML = `
+            <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('🎯 核心算理锁定：${cur.hint}')">
+                <span>📐</span><span>【模型识别】点此核验：本题属于哪种数量模型或几何模型？</span>
+            </button>
+            <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('⚠️ 警惕破绽：${cur.trapRule}')">
+                <span>⚠️</span><span>【避坑排查】点此核验：最容易算错的隐藏陷阱是什么？</span>
+            </button>
+        `;
     } else if (curSubject === 'cn') {
         preListenArea.style.display = 'none';
-        document.getElementById('prompt-tag-text').innerText = '📖 看着语境与提示，请在纸上工整默写或脱稿背诵：';
-        document.getElementById('main-prompt-text').innerText = cur.title + '\n\n' + cur.question;
-        btnShowAnswer.innerText = '👀 默写诵读完毕，核对形义';
+        dimTag.innerText = '📖 语文素养 · 形义与深层品读';
+        curveTag.innerText = '⚡ 语言建构与运用';
+        titleText.innerText = cur.title;
+
+        let formattedQ = cur.question.replace(/\\n/g, '<br>').replace(/(\d+\.)/g, '<strong style="color:#b45309;">$1</strong>');
+        bodyText.innerHTML = `
+            <div style="font-size:14px;color:#1e293b;line-height:1.7;">${formattedQ}</div>
+        `;
+
+        btnShowAnswer.innerText = '👀 默写诵读完毕，核对形义正解';
         btnWrong.innerText = '❌ 笔画写错 / 诵读卡壳';
         btnCorrect.innerText = '🗡️ 形义通透！准确刺击魔物';
+
+        scaffoldArea.style.display = 'block';
+        scaffoldList.innerHTML = `
+            <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('💡 核心解构提示：${cur.hint}')">
+                <span>💡</span><span>【字理与文意】点此核验：本题的核心生字部首或思辨主旨是什么？</span>
+            </button>
+            <button class="scaffold-opt-btn" onclick="triggerScaffoldHint('⚠️ 避坑锦囊：${cur.trapRule}')">
+                <span>⚠️</span><span>【易错笔画】点此核验：默写时最容易写错的多笔少画是哪里？</span>
+            </button>
+        `;
     }
 }
+
+// 阶梯提示动效触发
+function triggerScaffoldHint(msg) {
+    const toast = document.getElementById('scaffold-feedback-toast');
+    if (!toast) return alert(msg);
+    toast.style.display = 'block';
+    toast.style.background = '#fef3c7';
+    toast.style.border = '1px solid #fde047';
+    toast.style.color = '#92400e';
+    toast.innerHTML = msg.replace(/\\n/g, '<br>');
+}
+
 function revealAnswer() {
     const cur = currentQueue[currentIndex];
     document.getElementById('btn-show-answer').style.display = 'none';
@@ -2716,6 +3466,10 @@ function revealAnswer() {
 }
 function onJudgeResult(isCorrect) {
     const cur = currentQueue[currentIndex];
+    const itemKey = cur.word || cur.en || cur.title || ('item_' + cur.id);
+    const itemTitle = cur.title || cur.meaning || cur.word || cur.cn || '知识点';
+    recordMemoryAttempt(itemKey, isCorrect, curSubject, itemTitle);
+
     if (isCorrect) {
         bossHp = Math.max(0, bossHp - 10);
         updateBossDisplay();
