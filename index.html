@@ -374,6 +374,8 @@
     </style>
 </head>
 <body>
+    <!-- 全局专用音频播放器 (完美兼容微信/学习机/iPad/Android) -->
+    <audio id="global-game-audio" preload="auto" playsinline webkit-playsinline></audio>
 
     <!-- 顶部状态栏 -->
     <div class="player-bar">
@@ -567,70 +569,173 @@ function updatePlayerBar() {
     document.getElementById('mistake-badge').innerText = userData.mistakes.length;
 }
 
-/* ==================== 2. 全平台通用音频引擎 (支持微信/iPad/Safari/Chrome) ==================== */
-let activeAudio = null;
+/* ==================== 2. 全平台通用音频引擎 (本地高保真MP3 + 微信/学习机/iPad全兼容) ==================== */
+const AUDIO_TEXT_MAP = {"Zhang Peng is my good friend.": "t_3e3715e4f5.mp3", "Turn on the light.": "t_d282313e7e.mp3", "It is cloudy today.": "t_91eca53dd3.mp3", "He is tall and strong.": "t_d1f3b18cc8.mp3", "short hair": "t_b4708568fd.mp3", "My grandfather is a farmer.": "t_3ac396cef8.mp3", "Look! He has blue glasses and a brown hat.": "t_cd1804bb5c.mp3", "Really? What": "t_b882eb7db2.mp3", "It is rainy. Take an umbrella.": "t_28aea203f4.mp3", "I can make a snowman in winter.": "t_1d904a2497.mp3", "Yes, we can! But it will be windy in the afternoon.": "t_8e9302cc8e.mp3", "cook dinner": "t_8c003531fa.mp3", "in spring": "t_c2fa2aa9aa.mp3", "Let me sweep the floor.": "t_212de1ee0b.mp3", "There are four seasons in a year.": "t_633757cd45.mp3", "an important job": "t_c048d620bf.mp3", "This is my classroom.": "t_20aef68b47.mp3", "clean the room": "t_46b0372a56.mp3", "Let": "t_e1686078d1.mp3", "a big classroom": "t_0485c03dcd.mp3", "My mother is very busy today.": "t_d01d60e4bc.mp3", "We should help each other.": "t_b72374af2f.mp3", "tall and strong": "t_0cbd2bb2ed.mp3", "It is sunny and warm.": "t_eefcc3502f.mp3", "Can we go to the park and fly a kite?": "t_c6fea2ebd3.mp3", "a rainy morning": "t_c42b28bd24.mp3", "His name is Mike. He is very friendly.": "t_ec7321c4e5.mp3", "Autumn is golden. The leaves fall down.": "t_14a11555cd.mp3", "Put up the picture.": "t_79b70fa1a4.mp3", "He is a doctor. He is very busy.": "t_8a6c184667.mp3", "Let me clean the window.": "t_7dea280c77.mp3", "I can cook dinner for my family.": "t_1b93a45e44.mp3", "blue glasses": "t_a46db2e032.mp3", "My mother is tired. I can make a cup of tea for her.": "t_c9e6249c3e.mp3", "It is sunny and warm outside.": "t_12b8e51252.mp3", "Welcome to our community.": "t_b5fa58a5ee.mp3", "He is a firefighter. That": "t_e5328e58ba.mp3", "She is a kind nurse.": "t_de39055b0b.mp3", "He has blue glasses.": "t_d51810ec90.mp3", "What can we do to help today?": "t_56c7a8b09d.mp3", "in the park": "t_6e63037889.mp3", "There is a big playground and a beautiful park.": "t_da82a78a6f.mp3", "That is an important job.": "t_d7c23734ff.mp3", "Who is that brave man over there?": "t_39122ecebc.mp3", "windy and cool": "t_b61ffa3cd4.mp3", "four seasons": "t_35501d63ff.mp3", "Yes, it is rainy now. Take your umbrella.": "t_7a29c0d85c.mp3", "Look at the blackboard.": "t_0596ca137f.mp3", "cloudy today": "t_049dd6f29e.mp3", "a kind nurse": "t_59889ad8c3.mp3", "Good morning! What": "t_e50e9c47c7.mp3", "turn on the light": "t_28fc803276.mp3", "on the playground": "t_a8232f5f21.mp3", "a good friend": "t_489044f485.mp3", "help each other": "t_49dc446fb9.mp3", "Which season do you like best?": "t_9976f280da.mp3", "Welcome to our community!": "t_4d3737998a.mp3", "Is there a hospital near your home?": "t_9a737d2baf.mp3", "make a snowman": "t_5976995fe5.mp3", "He has short black hair.": "t_3049bc1b20.mp3", "My friend is very strong.": "t_0f99358249.mp3", "clean the window": "t_596a55dc06.mp3", "It is hot in summer. I like swimming.": "t_fdf4e8cfd0.mp3", "a heavy schoolbag": "t_f2f6b87522.mp3", "There is a pet hospital near my home.": "t_92417d05b4.mp3", "The shop is near the park.": "t_02d093bb8b.mp3", "Mum, I have a good friend in our new class.": "t_003dbe0d06.mp3", "my computer": "t_1e3f9545cd.mp3", "Summer is hot, but I can go swimming and eat ice cream.": "t_7a042de20f.mp3", "What": "t_4a2028ecea.mp3", "pet hospital": "t_a844cd95fe.mp3", "a nice picture": "t_f1c4914e57.mp3", "Is he tall or short?": "t_1b436faf87.mp3", "My aunt is a police officer.": "t_0dd0882995.mp3", "a sunny day": "t_bd601386aa.mp3", "in summer": "t_c0a66f8303.mp3", "He is a friendly bus driver.": "t_565f6f9647.mp3", "fine weather": "t_1209af9541.mp3", "a tall building": "t_415753e890.mp3", "I have a new schoolbag.": "t_39c157a832.mp3", "She is quiet and friendly.": "t_7a83670110.mp3", "I love our clean and quiet community.": "t_81c4828ac0.mp3", "in autumn": "t_11b9fdbf0c.mp3", "clean the blackboard": "t_275b066ce2.mp3", "near the park": "t_5d6cecdbd8.mp3", "Hello! Welcome to English Game!": "t_a85ad4644e.mp3", "My father is a doctor.": "t_bcef489530.mp3", "Yes, there is a pet hospital near the building.": "t_7ef31e40f3.mp3", "our community": "t_6306dcae97.mp3", "Dad is tired after work.": "t_26f115e9b2.mp3", "I like winter because I can make a snowman with my friends!": "t_8f99d10e35.mp3", "I often play football there with my friends.": "t_7798cb3577.mp3", "in winter": "t_618902d84c.mp3", "My uncle is a firefighter.": "t_2132b92256.mp3", "sweep the floor": "t_284df6d51b.mp3", "police officer": "t_3c11a4ad96.mp3", "Look at the dark clouds. Is it going to rain?": "t_faa488eea3.mp3", "Look at that tall building.": "t_89f3b8bc24.mp3", "very strong": "t_fb5f7af6bc.mp3", "Really? Let": "t_1e186695c6.mp3", "a maths book": "t_b0dd76dd03.mp3", "Spring is green and warm.": "t_10aedaeadf.mp3", "feel tired": "t_e41221eb32.mp3", "It is white in winter.": "t_f560e6be82.mp3", "a quiet girl": "t_7e2d33e587.mp3", "I often clean my room on weekends.": "t_42a5f165f3.mp3", "Thank you for helping our community!": "t_6495cc1975.mp3", "a good doctor": "t_cec7adca49.mp3", "bus driver": "t_014a393430.mp3", "an old farmer": "t_0a9847502c.mp3", "He is tall and strong. He has short hair.": "t_ae0285e51e.mp3", "I can clean my room and sweep the floor.": "t_fbbcee1761.mp3", "I like spring best because it is green and warm.": "t_371a45305e.mp3", "We play football on the playground.": "t_b51539f787.mp3", "People help each other in our community.": "t_4b13649481.mp3", "What can you do to help at home?": "t_99c2191656.mp3", "snowy and cold": "t_d41c6e6b28.mp3", "Autumn is golden and cool.": "t_b555e6cc02.mp3", "It": "t_0d149b90e7.mp3", "Hey, Zhang Peng. We have a new classroom.": "t_cf6bbd860a.mp3", "very busy": "t_0df8e98544.mp3", "There is a nice park.": "t_a7d39bc9e2.mp3", "Put your maths book away.": "t_2077e3077b.mp3", "a brave firefighter": "t_a18228d654.mp3", "It is snowy. Let": "t_212f0ce86f.mp3", "It is a computer.": "t_ad10cd446d.mp3", "Good job! You are a helpful child.": "t_f83265fe3c.mp3", "clean the park": "t_1d40b1b0b6.mp3"};
 
-// 通用云端高保真原声播放器 (微信WebView与移动端100%发音支持)
-function playOnlineVoice(text, isSlow = false, onEndCallback = null) {
-    if (!text) return;
-    const cleanText = text.trim();
+let globalAudio = null;
+let audioUnlocked = false;
+let audioPlayTimer = null;
 
+function getGlobalAudio() {
+    if (!globalAudio) {
+        globalAudio = document.getElementById('global-game-audio');
+    }
+    return globalAudio;
+}
+
+// 微信/iOS/Android 特别解锁逻辑
+function unlockAudio() {
+    if (audioUnlocked) return;
+    const a = getGlobalAudio();
+    if (!a) return;
     try {
-        if (activeAudio) {
-            activeAudio.pause();
-            activeAudio.currentTime = 0;
-        }
+        a.volume = 1.0;
+        audioUnlocked = true;
     } catch(e) {}
+}
 
-    let audioUrl = '';
-    // 单个词汇优先使用有道高保真美音MP3，句子或慢速拼读使用百度TTS
-    if (!cleanText.includes(' ') && cleanText.length < 25 && !isSlow) {
-        audioUrl = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(cleanText) + '&type=2';
+document.addEventListener("WeixinJSBridgeReady", function() {
+    unlockAudio();
+}, false);
+document.addEventListener("touchstart", unlockAudio, { once: true });
+document.addEventListener("click", unlockAudio, { once: true });
+
+// 屏幕发音动态波形指示器
+function showAudioIndicator(text) {
+    let ind = document.getElementById('audio-playing-indicator');
+    if (!ind) {
+        ind = document.createElement('div');
+        ind.id = 'audio-playing-indicator';
+        ind.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);color:#4ade80;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);z-index:99999;transition:opacity 0.25s;pointer-events:none;";
+        document.body.appendChild(ind);
+    }
+    const displayText = text.length > 20 ? text.slice(0, 18) + '...' : text;
+    ind.innerHTML = '<span>🔊 正在发音:</span><span style="color:#fff;">' + displayText + '</span><span style="letter-spacing:2px;font-size:14px;">🎵🎶</span>';
+    ind.style.display = 'flex';
+    ind.style.opacity = '1';
+
+    if (audioPlayTimer) clearTimeout(audioPlayTimer);
+    audioPlayTimer = setTimeout(() => {
+        if (ind) ind.style.opacity = '0';
+    }, 3500);
+}
+
+function hideAudioIndicator() {
+    const ind = document.getElementById('audio-playing-indicator');
+    if (ind) ind.style.opacity = '0';
+}
+
+// 声音测试专用函数
+function testSound() {
+    playAudioItem('text', 'Hello! Welcome to English Game!', () => {
+        alert("🔔 测试发音播放完毕！\n\n如果屏幕有发音提示但未听到声音，请检查：\n1. 平板是否处于【静音/勿扰】模式；\n2. 请按平板物理音量键，将【媒体音量】调到最大；\n3. 检查是否误连了蓝牙耳机。");
+    });
+}
+
+// 核心播放调度器：优先本地MP3，次选有道在线MP3，最后降级WebSpeech
+function playAudioItem(type, targetText, onEndCallback = null) {
+    if (!targetText) return;
+    const cleanText = targetText.trim();
+    const a = getGlobalAudio();
+    if (!a) return;
+
+    showAudioIndicator(cleanText);
+
+    // 计算音频本地路径
+    let localUrl = '';
+    const safeName = cleanText.toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+
+    if (type === 'word') {
+        localUrl = 'audio/words/' + safeName + '.mp3';
+    } else if (type === 'phonics') {
+        localUrl = 'audio/phonics/' + safeName + '_phonics.mp3';
     } else {
-        const spd = isSlow ? '2' : '3';
-        audioUrl = 'https://fanyi.baidu.com/gettts?lan=en&text=' + encodeURIComponent(cleanText) + '&spd=' + spd + '&source=web';
+        const mapFile = AUDIO_TEXT_MAP[cleanText];
+        if (mapFile) {
+            localUrl = 'audio/texts/' + mapFile;
+        } else {
+            // 备用：如果在映射表没找到，则使用有道
+            localUrl = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(cleanText) + '&type=2';
+        }
     }
 
     try {
-        activeAudio = new Audio(audioUrl);
-        if (onEndCallback) {
-            activeAudio.onended = onEndCallback;
-        }
-        const playPromise = activeAudio.play();
-        if (playPromise !== undefined) {
-            playPromise.catch(err => {
-                console.warn('Audio play failed, fallback to WebSpeech', err);
-                fallbackWebSpeech(cleanText, isSlow);
+        a.pause();
+        a.src = localUrl;
+        a.load();
+
+        a.onended = function() {
+            hideAudioIndicator();
+            if (onEndCallback) onEndCallback();
+        };
+
+        a.onerror = function() {
+            console.warn('Local MP3 failed, trying fallback to Youdao:', localUrl);
+            fallbackYoudaoAudio(cleanText, onEndCallback);
+        };
+
+        const p = a.play();
+        if (p !== undefined) {
+            p.catch(err => {
+                console.warn('Audio play catch:', err);
+                // 尝试有道在线发音
+                fallbackYoudaoAudio(cleanText, onEndCallback);
             });
         }
-    } catch(err) {
-        fallbackWebSpeech(cleanText, isSlow);
+    } catch(e) {
+        fallbackYoudaoAudio(cleanText, onEndCallback);
     }
 }
 
-function fallbackWebSpeech(text, isSlow) {
+// 降级1：有道在线词典发音
+function fallbackYoudaoAudio(text, onEndCallback) {
+    const a = getGlobalAudio();
+    if (!a) return;
+    try {
+        a.src = 'https://dict.youdao.com/dictvoice?audio=' + encodeURIComponent(text) + '&type=2';
+        a.load();
+        a.onended = function() {
+            hideAudioIndicator();
+            if (onEndCallback) onEndCallback();
+        };
+        a.onerror = function() {
+            fallbackWebSpeech(text, onEndCallback);
+        };
+        a.play().catch(() => {
+            fallbackWebSpeech(text, onEndCallback);
+        });
+    } catch(e) {
+        fallbackWebSpeech(text, onEndCallback);
+    }
+}
+
+// 降级2：原生WebSpeech
+function fallbackWebSpeech(text, onEndCallback) {
     if (!window.speechSynthesis) return;
     try {
         window.speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(text);
         utter.lang = 'en-US';
-        utter.rate = isSlow ? 0.7 : 0.85;
+        utter.rate = 0.85;
+        utter.onend = () => {
+            hideAudioIndicator();
+            if (onEndCallback) onEndCallback();
+        };
         window.speechSynthesis.speak(utter);
     } catch(e){}
 }
 
 // 统一标准发音入口
 function speakWordStandard(text) {
-    playOnlineVoice(text, false);
+    playAudioItem('word', text);
 }
 
-// 杨妈分音节慢速拆音拼读入口 (例如 doc... tor... doctor)
+// 杨妈分音节慢速拆音拼读入口
 function speakWordPhonics(phonicsArray, finalWord) {
-    const chunkText = phonicsArray.join(', ... ') + ', ... ' + finalWord;
-    playOnlineVoice(chunkText, true);
+    playAudioItem('phonics', finalWord);
 }
 
-// 音效引擎 (Web Audio 带微信/iOS状态自恢复保护，绝不报错阻塞)
+// 音效引擎 (Web Audio)
 let audioCtx = null;
 function getAudioContext() {
     if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
@@ -1263,39 +1368,47 @@ function revealAnswer() {
 function playCurrentStandard() {
     if (!currentQueue || !currentQueue[currentIndex]) return;
     const cur = currentQueue[currentIndex];
-    speakWordStandard(curMode === 'words' ? cur.word : cur.en);
+    if (curMode === 'words') {
+        playAudioItem('word', cur.word);
+    } else {
+        playAudioItem('text', cur.en);
+    }
 }
 
 function playCurrentSlow() {
     if (!currentQueue || !currentQueue[currentIndex]) return;
     const cur = currentQueue[currentIndex];
-    playOnlineVoice(curMode === 'words' ? cur.word : cur.en, true);
+    if (curMode === 'words') {
+        playAudioItem('word', cur.word);
+    } else {
+        playAudioItem('text', cur.en);
+    }
 }
 
 function playCurrentPhonicsSlow() {
     if (!currentQueue || !currentQueue[currentIndex]) return;
     const cur = currentQueue[currentIndex];
     if (curMode === 'words') {
-        speakWordPhonics(cur.syllables || [cur.word], cur.word);
+        playAudioItem('phonics', cur.word);
     } else {
-        playOnlineVoice(cur.en, true);
+        playAudioItem('text', cur.en);
     }
 }
 
-// 供弹窗三连招调用的安全播放函数 (完全避免 HTML 内联单引号转义报错)
+// 供弹窗三连招调用的安全播放函数
 function playComboWord() {
     if (currentQueue && currentQueue[currentIndex]) {
-        speakWordStandard(currentQueue[currentIndex].word);
+        playAudioItem('word', currentQueue[currentIndex].word);
     }
 }
 function playComboPhrase() {
     if (currentQueue && currentQueue[currentIndex]) {
-        speakWordStandard(currentQueue[currentIndex].level2);
+        playAudioItem('text', currentQueue[currentIndex].level2);
     }
 }
 function playComboSentence() {
     if (currentQueue && currentQueue[currentIndex]) {
-        speakWordStandard(curMode === 'words' ? currentQueue[currentIndex].level3 : currentQueue[currentIndex].en);
+        playAudioItem('text', curMode === 'words' ? currentQueue[currentIndex].level3 : currentQueue[currentIndex].en);
     }
 }
 
