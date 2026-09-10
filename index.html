@@ -429,6 +429,139 @@
         .btn-wrong { background: #f59e0b; color: white; flex: 1; }
         .btn-correct { background: linear-gradient(135deg, #15803d, #22c55e); color: white; flex: 1.3; }
 
+        
+        /* 英雄头像与试衣间样式 */
+        .hero-avatar-badge {
+            display: flex;
+            align-items: center;
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            padding: 2px 6px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .hero-avatar-badge:active { transform: scale(0.95); }
+        .avatar-compact {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1px;
+            letter-spacing: -2px;
+        }
+        .dress-tag {
+            font-size: 10px;
+            font-weight: 800;
+            color: #4338ca;
+            background: #e0e7ff;
+            padding: 1px 4px;
+            border-radius: 6px;
+            margin-left: 4px;
+        }
+
+        /* 试衣间舞台 */
+        .avatar-stage {
+            background: linear-gradient(135deg, #e0f2fe, #f0fdf4);
+            border: 2px solid #bae6fd;
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 14px;
+            position: relative;
+            min-height: 120px;
+        }
+        .stage-main-char {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .stage-hat { font-size: 38px; margin-bottom: -10px; z-index: 2; transition: all 0.2s; }
+        .stage-body-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
+        .stage-body { font-size: 46px; z-index: 1; }
+        .stage-wep { font-size: 34px; margin-left: -10px; z-index: 3; }
+        .stage-pet { font-size: 32px; position: absolute; left: 24px; bottom: 14px; animation: floatPet 2s ease-in-out infinite alternate; }
+
+        @keyframes floatPet { from { transform: translateY(0); } to { transform: translateY(-6px); } }
+
+        /* 装扮分类Tab与物品网格 */
+        .dress-cat-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+        .dress-cat-btn {
+            flex: 1;
+            padding: 6px 2px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid #cbd5e1;
+            background: #f8fafc;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .dress-cat-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4338ca;
+        }
+        .dress-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+        .dress-item-card {
+            background: white;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dress-item-card.equipped {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+        .item-icon { font-size: 26px; margin-bottom: 2px; }
+        .item-name { font-size: 12px; font-weight: 800; color: #1e293b; margin-bottom: 2px; }
+        .item-desc { font-size: 10px; color: #64748b; margin-bottom: 6px; }
+        .item-btn {
+            width: 100%;
+            padding: 4px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+        }
+        .item-btn.btn-equip { background: #4f46e5; color: white; }
+        .item-btn.btn-equipped { background: #10b981; color: white; cursor: default; }
+        .item-btn.btn-buy { background: #f59e0b; color: white; }
+
+        /* 升级指引成长树 */
+        .level-tree-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 8px;
+            border-bottom: 1px dashed #e2e8f0;
+            text-align: left;
+        }
+        .level-tree-icon {
+            font-size: 22px;
+            background: #f1f5f9;
+            padding: 6px;
+            border-radius: 10px;
+        }
+        .level-tree-info { flex: 1; font-size: 12px; }
+        .level-tree-title { font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+        .level-tree-desc { font-size: 11px; color: #64748b; line-height: 1.4; }
+
         /* 弹窗 */
         .modal-mask {
             position: fixed;
@@ -473,20 +606,26 @@
 
     <!-- 顶部状态栏 -->
     <div class="player-bar">
-        <div class="player-info">
-            <span class="level-badge" id="player-level-tag">Lv.1 见习小猎人</span>
+        <div class="player-info" onclick="openLevelGuideModal()" style="cursor:pointer;" title="点击查看升级路线与成长秘籍">
+            <div class="hero-avatar-badge" onclick="event.stopPropagation(); openDressingRoom();" title="点击进入英雄试衣间">
+                <div class="avatar-compact" id="avatar-compact-display">
+                    <span id="c-pet">🦉</span><span id="c-hat">🧢</span><span id="c-body">🥋</span><span id="c-wep">🗡️</span>
+                </div>
+                <span class="dress-tag">换装</span>
+            </div>
             <div>
-                <div class="player-name">PEP新课标勇者</div>
+                <div style="display:flex;align-items:center;gap:4px;">
+                    <span class="level-badge" id="player-level-tag">Lv.1 见习小猎人</span>
+                    <span style="font-size:10px;color:#0284c7;font-weight:700;">👆升级指引</span>
+                </div>
                 <div class="exp-box"><div class="exp-fill" id="exp-fill-bar"></div></div>
             </div>
         </div>
         <div class="stats-right">
             <div class="stat-item combo-pill" id="combo-badge">🔥 <span id="combo-num">0</span>连击</div>
-            <div class="stat-item coin-pill">💰 <span id="coin-count">0</span></div>
+            <div class="stat-item coin-pill" onclick="openDressingRoom()" style="cursor:pointer;" title="点击装扮商店">🪙 <span id="coin-count">0</span></div>
         </div>
     </div>
-
-    <!-- 屏幕容器 -->
     <div class="screen-container">
 
         <!-- 首页关卡选择 -->
@@ -651,22 +790,75 @@
     </div>
 
 <script>
-/* ==================== 1. 本地存储与用户成长系统 ==================== */
-const USER_KEY = 'rocky_pep_english_v2';
+/* ==================== 1. 本地存储、换装与用户成长系统 ==================== */
+const USER_KEY = 'rocky_pep_english_v3';
+
+// 道具全套图鉴库 (头饰、武器、战甲、萌宠、现实特权契约卡)
+const ITEM_DATABASE = {
+    hat: [
+        { id: "hat_1", icon: "🧢", name: "猎人便帽", desc: "新手冒险家的轻便软帽", price: 0, rarity: "普通" },
+        { id: "hat_2", icon: "🪖", name: "钢铁战盔", desc: "抵挡魔物精神重击", price: 30, rarity: "稀有" },
+        { id: "hat_3", icon: "🧙", name: "贤者斗笠", desc: "散发智慧与深邃法力", price: 60, rarity: "史诗" },
+        { id: "hat_4", icon: "👑", name: "璀璨王冠", desc: "满级学神至尊象征", price: 100, rarity: "传说" }
+    ],
+    weapon: [
+        { id: "wep_1", icon: "🗡️", name: "初学铁剑", desc: "轻巧锋利，听音直刺", price: 0, rarity: "普通" },
+        { id: "wep_2", icon: "⚔️", name: "双持圣刃", desc: "暴击双倍伤害", price: 40, rarity: "稀有" },
+        { id: "wep_3", icon: "🪄", name: "智慧法杖", desc: "算理通透，光芒万丈", price: 70, rarity: "史诗" },
+        { id: "wep_4", icon: "🏹", name: "神木长弓", desc: "百步穿杨，音节必中", price: 90, rarity: "史诗" }
+    ],
+    armor: [
+        { id: "arm_1", icon: "🥋", name: "结实布衣", desc: "透气舒适，便于奔跑", price: 0, rarity: "普通" },
+        { id: "arm_2", icon: "🛡️", name: "骑士重铠", desc: "刀枪不入，免疫粗心", price: 45, rarity: "稀有" },
+        { id: "arm_3", icon: "🧥", name: "星空法袍", desc: "星光护体，思维灵动", price: 75, rarity: "史诗" },
+        { id: "arm_4", icon: "🦹", name: "烈焰斗篷", desc: "王者归来，威震关底", price: 110, rarity: "传说" }
+    ],
+    pet: [
+        { id: "pet_1", icon: "🦉", name: "聪慧猫头鹰", desc: "时刻提醒你不要漏写字母", price: 0, rarity: "普通" },
+        { id: "pet_2", icon: "🐶", name: "忠诚柴犬", desc: "嗅出题干里的所有陷阱", price: 35, rarity: "稀有" },
+        { id: "pet_3", icon: "🐱", name: "招财橘猫", desc: "每次答对额外增加金币", price: 50, rarity: "稀有" },
+        { id: "pet_4", icon: "🐲", name: "幼年火龙", desc: "神兽护体，神级通关搭档", price: 120, rarity: "传说" }
+    ]
+};
+
+// 随机战利品惊喜池 (包含实体特权卡)
+const SURPRISE_CARDS = [
+    { title: "免做一次家务特权卡 🧹", desc: "可抵消一次擦桌子或扫地家务！" },
+    { title: "自由游玩 20 分钟兑换卡 🎮", desc: "凭此卡找爸爸兑换 20 分钟自由游戏时间！" },
+    { title: "挑选心爱小零食一张 🍬", desc: "可自由选购一件美味小甜点或零食！" },
+    { title: "看一部精彩动画片兑换卡 🎬", desc: "周末可挑选一部心仪的大电影或动画！" },
+    { title: "神秘暴击金币大福袋 💰", desc: "直接获得 50 枚金币！", coins: 50 }
+];
+
 let userData = {
     xp: 0,
-    coins: 0,
+    coins: 20,
     level: 1,
     combo: 0,
+    equipped: {
+        hat: "hat_1",
+        weapon: "wep_1",
+        armor: "arm_1",
+        pet: "pet_1"
+    },
+    ownedItems: ["hat_1", "wep_1", "arm_1", "pet_1"],
+    contractCards: [],
     mistakes: []
 };
 
 function loadUserData() {
     try {
         const saved = localStorage.getItem(USER_KEY);
-        if (saved) userData = Object.assign(userData, JSON.parse(saved));
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            userData = Object.assign(userData, parsed);
+            if (!userData.ownedItems) userData.ownedItems = ["hat_1", "wep_1", "arm_1", "pet_1"];
+            if (!userData.equipped) userData.equipped = { hat: "hat_1", weapon: "wep_1", armor: "arm_1", pet: "pet_1" };
+            if (!userData.contractCards) userData.contractCards = [];
+        }
     } catch(e){}
     updatePlayerBar();
+    updateAvatarDisplay();
 }
 
 function saveUserData() {
@@ -680,7 +872,18 @@ function addRewards(earnedXp, earnedCoins) {
     if (newLevel > userData.level) {
         userData.level = newLevel;
         playLevelUpAudio();
-        alert('🎉 恭喜升级！当前等级：Lv.' + userData.level + ' ' + getLevelTitle(userData.level));
+        openModal(`
+            <div style="font-size:54px;margin-bottom:6px;">🎊</div>
+            <h2 class="modal-title" style="color:#d97706;">🏆 勇者荣耀升级！</h2>
+            <div style="font-size:18px;font-weight:900;color:var(--primary);margin-bottom:6px;">
+                Lv.${userData.level} ${getLevelTitle(userData.level)}
+            </div>
+            <p style="font-size:12px;color:#64748b;margin-bottom:12px;">
+                神经通路再次进阶！获得升级奖励：💰 30 金币！
+            </p>
+            <button class="btn-large btn-correct" onclick="closeModal()">收下奖励，继续前行！</button>
+        `);
+        userData.coins += 30;
     }
     saveUserData();
     updatePlayerBar();
@@ -688,26 +891,273 @@ function addRewards(earnedXp, earnedCoins) {
 
 function getLevelTitle(lvl) {
     if (lvl >= 8) return '绝世背诵宗师 👑';
-    if (lvl >= 6) return '钻石单词大师 💎';
-    if (lvl >= 4) return '黄金语感剑圣 ⚔️';
-    if (lvl >= 2) return '拼读小先锋 🏹';
+    if (lvl >= 6) return '钻石知识导师 💎';
+    if (lvl >= 5) return '圣堂战神 🌟';
+    if (lvl >= 4) return '黄金骑士 ⚔️';
+    if (lvl >= 3) return '秘境游侠 🏹';
+    if (lvl >= 2) return '铁刃先锋 🗡️';
     return '见习小猎人 🛡️';
 }
 
 function updatePlayerBar() {
-    document.getElementById('player-level-tag').innerText = 'Lv.' + userData.level + ' ' + getLevelTitle(userData.level);
-    document.getElementById('coin-count').innerText = userData.coins;
-    document.getElementById('exp-fill-bar').style.width = (userData.xp % 100) + '%';
+    const lvlTag = document.getElementById('player-level-tag');
+    if (lvlTag) lvlTag.innerText = 'Lv.' + userData.level + ' ' + getLevelTitle(userData.level);
+    const coinEl = document.getElementById('coin-count');
+    if (coinEl) coinEl.innerText = userData.coins;
+    const expBar = document.getElementById('exp-fill-bar');
+    if (expBar) expBar.style.width = (userData.xp % 100) + '%';
     const comboBadge = document.getElementById('combo-badge');
-    if (userData.combo >= 2) {
-        comboBadge.style.display = 'flex';
-        document.getElementById('combo-num').innerText = userData.combo;
-    } else {
-        comboBadge.style.display = 'none';
+    if (comboBadge) {
+        if (userData.combo >= 2) {
+            comboBadge.style.display = 'flex';
+            document.getElementById('combo-num').innerText = userData.combo;
+        } else {
+            comboBadge.style.display = 'none';
+        }
     }
-    document.getElementById('mistake-badge').innerText = userData.mistakes.length;
+    const misBadge = document.getElementById('mistake-badge');
+    if (misBadge) misBadge.innerText = userData.mistakes.length;
 }
 
+// 同步更新人物立绘图标
+function updateAvatarDisplay() {
+    const getIcon = (type, id) => {
+        const item = ITEM_DATABASE[type].find(x => x.id === id);
+        return item ? item.icon : '';
+    };
+
+    const petIcon = getIcon('pet', userData.equipped.pet);
+    const hatIcon = getIcon('hat', userData.equipped.hat);
+    const bodyIcon = getIcon('armor', userData.equipped.armor);
+    const wepIcon = getIcon('weapon', userData.equipped.weapon);
+
+    const cPet = document.getElementById('c-pet');
+    const cHat = document.getElementById('c-hat');
+    const cBody = document.getElementById('c-body');
+    const cWep = document.getElementById('c-wep');
+
+    if (cPet) cPet.innerText = petIcon;
+    if (cHat) cHat.innerText = hatIcon;
+    if (cBody) cBody.innerText = bodyIcon;
+    if (cWep) cWep.innerText = wepIcon;
+}
+
+/* ==================== 升级指引成长树 ==================== */
+function openLevelGuideModal() {
+    const currentLvl = userData.level;
+    const currentXp = userData.xp;
+    const curLvlXp = currentXp % 100;
+
+    openModal(`
+        <h2 class="modal-title" style="color:#0284c7;">🏆 勇者晋升路线与升级秘籍</h2>
+        <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:12px;margin:10px 0;text-align:left;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800;color:#0369a1;margin-bottom:6px;">
+                <span>当前段位：Lv.${currentLvl} ${getLevelTitle(currentLvl)}</span>
+                <span>${curLvlXp} / 100 EXP</span>
+            </div>
+            <div style="width:100%;height:8px;background:#e0f2fe;border-radius:4px;overflow:hidden;">
+                <div style="width:${curLvlXp}%;height:100%;background:#0284c7;"></div>
+            </div>
+        </div>
+
+        <div style="text-align:left;margin-bottom:12px;">
+            <div style="font-size:12px;font-weight:800;color:#166534;margin-bottom:6px;">⚡ 怎样升级最快？（科学升级四部曲）：</div>
+            <div style="font-size:11px;color:#334155;line-height:1.6;background:#f8fafc;padding:8px 10px;border-radius:8px;">
+                • 🎯 <strong>日常挑战</strong>：每天完成语数英10分钟关卡，每题独立答对 <strong>+15 EXP</strong>！<br>
+                • 🔥 <strong>保持连击</strong>：连续答对触发Combo暴击，每次额外加成 <strong>+2~10 EXP</strong>！<br>
+                • ⚔️ <strong>错题大复仇</strong>：在【错题背包】中复仇成功，触发双倍暴击经验 <strong>+20 EXP</strong>！<br>
+                • 👑 <strong>击破魔物</strong>：击败关底大BOSS直接掉落 <strong>+50 EXP</strong> 与黄金宝箱！
+            </div>
+        </div>
+
+        <div style="text-align:left;font-size:12px;font-weight:800;color:#0f172a;margin-bottom:6px;">🗺️ 全等级段位荣耀进阶树：</div>
+        <div style="max-height:200px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:10px;margin-bottom:14px;">
+            <div class="level-tree-item">
+                <div class="level-tree-icon">🛡️</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.1 见习小猎人 (0 EXP)</div>
+                    <div class="level-tree-desc">初始阶段，配备初学者木剑与布衣，解锁语数英全部基础关卡。</div>
+                </div>
+            </div>
+            <div class="level-tree-item">
+                <div class="level-tree-icon">🗡️</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.2 铁刃先锋 (100 EXP)</div>
+                    <div class="level-tree-desc">解锁【战斗随机稀有道具掉落】系统与初级换装。</div>
+                </div>
+            </div>
+            <div class="level-tree-item">
+                <div class="level-tree-icon">🏹</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.3 秘境游侠 (250 EXP)</div>
+                    <div class="level-tree-desc">连击暴击率大幅提升，解锁烈焰斗篷与游侠神木长弓。</div>
+                </div>
+            </div>
+            <div class="level-tree-item">
+                <div class="level-tree-icon">⚔️</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.4 黄金骑士 (500 EXP)</div>
+                    <div class="level-tree-desc">解锁黄金骑士铠与双倍掉落幸运值。</div>
+                </div>
+            </div>
+            <div class="level-tree-item">
+                <div class="level-tree-icon">🌟</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.5 圣堂战神 (800 EXP)</div>
+                    <div class="level-tree-desc">解锁璀璨王冠与神圣光芒外观。</div>
+                </div>
+            </div>
+            <div class="level-tree-item">
+                <div class="level-tree-icon">👑</div>
+                <div class="level-tree-info">
+                    <div class="level-tree-title">Lv.6~8 绝世宗师 (1200+ EXP)</div>
+                    <div class="level-tree-desc">解锁传说神兽【幼年小火龙 🐲】专属战宠！</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-large btn-correct" onclick="closeModal()">清楚了，去打怪升级！</button>
+    `);
+}
+
+/* ==================== 英雄试衣间与换装系统 ==================== */
+let currentDressingTab = 'hat';
+
+function openDressingRoom() {
+    renderDressingRoom();
+}
+
+function setDressingTab(tab) {
+    currentDressingTab = tab;
+    renderDressingRoom();
+}
+
+function renderDressingRoom() {
+    const getIcon = (type, id) => {
+        const item = ITEM_DATABASE[type].find(x => x.id === id);
+        return item ? item.icon : '';
+    };
+
+    const petIcon = getIcon('pet', userData.equipped.pet);
+    const hatIcon = getIcon('hat', userData.equipped.hat);
+    const bodyIcon = getIcon('armor', userData.equipped.armor);
+    const wepIcon = getIcon('weapon', userData.equipped.weapon);
+
+    const items = ITEM_DATABASE[currentDressingTab];
+    const itemsHtml = items.map(item => {
+        const isEquipped = userData.equipped[currentDressingTab] === item.id;
+        const isOwned = userData.ownedItems.includes(item.id);
+
+        let actionBtn = '';
+        if (isEquipped) {
+            actionBtn = `<button class="item-btn btn-equipped">✅ 穿戴中</button>`;
+        } else if (isOwned) {
+            actionBtn = `<button class="item-btn btn-equip" onclick="equipItem('${currentDressingTab}', '${item.id}')">✨ 立即换装</button>`;
+        } else {
+            actionBtn = `<button class="item-btn btn-buy" onclick="buyItem('${item.id}', ${item.price})">🪙 ${item.price}金币兑换</button>`;
+        }
+
+        return `
+            <div class="dress-item-card ${isEquipped ? 'equipped' : ''}">
+                <div class="item-icon">${item.icon}</div>
+                <div class="item-name">${item.name}</div>
+                <div class="item-desc">${item.desc}</div>
+                ${actionBtn}
+            </div>
+        `;
+    }).join('');
+
+    openModal(`
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <h2 class="modal-title" style="margin:0;color:#4338ca;">🪞 英雄试衣间</h2>
+            <div style="font-size:13px;font-weight:800;color:#b45309;background:#fef3c7;padding:3px 10px;border-radius:12px;">🪙 拥有金币: ${userData.coins}</div>
+        </div>
+
+        <!-- 试衣间立绘大舞台 -->
+        <div class="avatar-stage">
+            <div class="stage-pet" id="stage-pet">${petIcon}</div>
+            <div class="stage-main-char">
+                <div class="stage-hat" id="stage-hat">${hatIcon}</div>
+                <div class="stage-body-wrap">
+                    <div class="stage-body" id="stage-body">${bodyIcon}</div>
+                    <div class="stage-wep" id="stage-wep">${wepIcon}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分类选择 -->
+        <div class="dress-cat-tabs">
+            <button class="dress-cat-btn ${currentDressingTab==='hat'?'active':''}" onclick="setDressingTab('hat')">🧢 头饰</button>
+            <button class="dress-cat-btn ${currentDressingTab==='weapon'?'active':''}" onclick="setDressingTab('weapon')">🗡️ 武器</button>
+            <button class="dress-cat-btn ${currentDressingTab==='armor'?'active':''}" onclick="setDressingTab('armor')">🥋 战铠</button>
+            <button class="dress-cat-btn ${currentDressingTab==='pet'?'active':''}" onclick="setDressingTab('pet')">🦉 萌宠</button>
+        </div>
+
+        <!-- 物品网格 -->
+        <div class="dress-grid">${itemsHtml}</div>
+
+        <button class="action-voice-btn" style="width:100%;margin-top:12px;justify-content:center;background:#f1f5f9;" onclick="closeModal()">保存装扮并返回</button>
+    `);
+}
+
+function equipItem(type, itemId) {
+    userData.equipped[type] = itemId;
+    saveUserData();
+    updateAvatarDisplay();
+    renderDressingRoom();
+}
+
+function buyItem(itemId, price) {
+    if (userData.coins < price) {
+        return alert('🪙 金币不足！快去挑战关卡或大复仇赚取金币吧！');
+    }
+    userData.coins -= price;
+    userData.ownedItems.push(itemId);
+    saveUserData();
+    updatePlayerBar();
+    renderDressingRoom();
+    alert('🎉 恭喜获得新装扮！已放入衣橱！');
+}
+
+/* ==================== 随机惊喜掉落系统 (《让学习像游戏一样上瘾》) ==================== */
+function checkRandomDrop() {
+    // 25% 概率触发随机惊喜掉落
+    if (Math.random() > 0.28) return;
+
+    // 随机选择掉落未拥有的装备，或者实体特权契约卡
+    const unownedEquips = [];
+    ['hat', 'weapon', 'armor', 'pet'].forEach(type => {
+        ITEM_DATABASE[type].forEach(item => {
+            if (!userData.ownedItems.includes(item.id)) {
+                unownedEquips.push({ type, item });
+            }
+        });
+    });
+
+    if (unownedEquips.length > 0 && Math.random() < 0.6) {
+        // 掉落装备
+        const picked = unownedEquips[Math.floor(Math.random() * unownedEquips.length)];
+        userData.ownedItems.push(picked.item.id);
+        saveUserData();
+        playLevelUpAudio();
+        setTimeout(() => {
+            alert(`🎁【✨ 战利品幸运掉落！】\n\n魔物被你的精准输出震慑，掉落了稀有装备：\n【${picked.item.icon} ${picked.item.name}】！\n\n已存入你的【🪞 英雄试衣间】，快去换上新装备吧！`);
+        }, 350);
+    } else {
+        // 掉落契约特权卡或金币
+        const card = SURPRISE_CARDS[Math.floor(Math.random() * SURPRISE_CARDS.length)];
+        userData.contractCards.push(card);
+        if (card.coins) {
+            userData.coins += card.coins;
+        }
+        saveUserData();
+        updatePlayerBar();
+        playLevelUpAudio();
+        setTimeout(() => {
+            alert(`🎉【✨ 幸运掉落：契约神卡！】\n\n获得特权奖励：\n🌟 ${card.title}\n\n“${card.desc}”\n已存入你的荣誉战报！`);
+        }, 350);
+    }
+}
 /* ==================== 2. 全平台通用音频引擎 (本地高保真MP3 + 微信/学习机/iPad全兼容) ==================== */
 const AUDIO_TEXT_MAP = {"Zhang Peng is my good friend.": "t_3e3715e4f5.mp3", "Turn on the light.": "t_d282313e7e.mp3", "It is cloudy today.": "t_91eca53dd3.mp3", "He is tall and strong.": "t_d1f3b18cc8.mp3", "short hair": "t_b4708568fd.mp3", "My grandfather is a farmer.": "t_3ac396cef8.mp3", "Look! He has blue glasses and a brown hat.": "t_cd1804bb5c.mp3", "Really? What": "t_b882eb7db2.mp3", "It is rainy. Take an umbrella.": "t_28aea203f4.mp3", "I can make a snowman in winter.": "t_1d904a2497.mp3", "Yes, we can! But it will be windy in the afternoon.": "t_8e9302cc8e.mp3", "cook dinner": "t_8c003531fa.mp3", "in spring": "t_c2fa2aa9aa.mp3", "Let me sweep the floor.": "t_212de1ee0b.mp3", "There are four seasons in a year.": "t_633757cd45.mp3", "an important job": "t_c048d620bf.mp3", "This is my classroom.": "t_20aef68b47.mp3", "clean the room": "t_46b0372a56.mp3", "Let": "t_e1686078d1.mp3", "a big classroom": "t_0485c03dcd.mp3", "My mother is very busy today.": "t_d01d60e4bc.mp3", "We should help each other.": "t_b72374af2f.mp3", "tall and strong": "t_0cbd2bb2ed.mp3", "It is sunny and warm.": "t_eefcc3502f.mp3", "Can we go to the park and fly a kite?": "t_c6fea2ebd3.mp3", "a rainy morning": "t_c42b28bd24.mp3", "His name is Mike. He is very friendly.": "t_ec7321c4e5.mp3", "Autumn is golden. The leaves fall down.": "t_14a11555cd.mp3", "Put up the picture.": "t_79b70fa1a4.mp3", "He is a doctor. He is very busy.": "t_8a6c184667.mp3", "Let me clean the window.": "t_7dea280c77.mp3", "I can cook dinner for my family.": "t_1b93a45e44.mp3", "blue glasses": "t_a46db2e032.mp3", "My mother is tired. I can make a cup of tea for her.": "t_c9e6249c3e.mp3", "It is sunny and warm outside.": "t_12b8e51252.mp3", "Welcome to our community.": "t_b5fa58a5ee.mp3", "He is a firefighter. That": "t_e5328e58ba.mp3", "She is a kind nurse.": "t_de39055b0b.mp3", "He has blue glasses.": "t_d51810ec90.mp3", "What can we do to help today?": "t_56c7a8b09d.mp3", "in the park": "t_6e63037889.mp3", "There is a big playground and a beautiful park.": "t_da82a78a6f.mp3", "That is an important job.": "t_d7c23734ff.mp3", "Who is that brave man over there?": "t_39122ecebc.mp3", "windy and cool": "t_b61ffa3cd4.mp3", "four seasons": "t_35501d63ff.mp3", "Yes, it is rainy now. Take your umbrella.": "t_7a29c0d85c.mp3", "Look at the blackboard.": "t_0596ca137f.mp3", "cloudy today": "t_049dd6f29e.mp3", "a kind nurse": "t_59889ad8c3.mp3", "Good morning! What": "t_e50e9c47c7.mp3", "turn on the light": "t_28fc803276.mp3", "on the playground": "t_a8232f5f21.mp3", "a good friend": "t_489044f485.mp3", "help each other": "t_49dc446fb9.mp3", "Which season do you like best?": "t_9976f280da.mp3", "Welcome to our community!": "t_4d3737998a.mp3", "Is there a hospital near your home?": "t_9a737d2baf.mp3", "make a snowman": "t_5976995fe5.mp3", "He has short black hair.": "t_3049bc1b20.mp3", "My friend is very strong.": "t_0f99358249.mp3", "clean the window": "t_596a55dc06.mp3", "It is hot in summer. I like swimming.": "t_fdf4e8cfd0.mp3", "a heavy schoolbag": "t_f2f6b87522.mp3", "There is a pet hospital near my home.": "t_92417d05b4.mp3", "The shop is near the park.": "t_02d093bb8b.mp3", "Mum, I have a good friend in our new class.": "t_003dbe0d06.mp3", "my computer": "t_1e3f9545cd.mp3", "Summer is hot, but I can go swimming and eat ice cream.": "t_7a042de20f.mp3", "What": "t_4a2028ecea.mp3", "pet hospital": "t_a844cd95fe.mp3", "a nice picture": "t_f1c4914e57.mp3", "Is he tall or short?": "t_1b436faf87.mp3", "My aunt is a police officer.": "t_0dd0882995.mp3", "a sunny day": "t_bd601386aa.mp3", "in summer": "t_c0a66f8303.mp3", "He is a friendly bus driver.": "t_565f6f9647.mp3", "fine weather": "t_1209af9541.mp3", "a tall building": "t_415753e890.mp3", "I have a new schoolbag.": "t_39c157a832.mp3", "She is quiet and friendly.": "t_7a83670110.mp3", "I love our clean and quiet community.": "t_81c4828ac0.mp3", "in autumn": "t_11b9fdbf0c.mp3", "clean the blackboard": "t_275b066ce2.mp3", "near the park": "t_5d6cecdbd8.mp3", "Hello! Welcome to English Game!": "t_a85ad4644e.mp3", "My father is a doctor.": "t_bcef489530.mp3", "Yes, there is a pet hospital near the building.": "t_7ef31e40f3.mp3", "our community": "t_6306dcae97.mp3", "Dad is tired after work.": "t_26f115e9b2.mp3", "I like winter because I can make a snowman with my friends!": "t_8f99d10e35.mp3", "I often play football there with my friends.": "t_7798cb3577.mp3", "in winter": "t_618902d84c.mp3", "My uncle is a firefighter.": "t_2132b92256.mp3", "sweep the floor": "t_284df6d51b.mp3", "police officer": "t_3c11a4ad96.mp3", "Look at the dark clouds. Is it going to rain?": "t_faa488eea3.mp3", "Look at that tall building.": "t_89f3b8bc24.mp3", "very strong": "t_fb5f7af6bc.mp3", "Really? Let": "t_1e186695c6.mp3", "a maths book": "t_b0dd76dd03.mp3", "Spring is green and warm.": "t_10aedaeadf.mp3", "feel tired": "t_e41221eb32.mp3", "It is white in winter.": "t_f560e6be82.mp3", "a quiet girl": "t_7e2d33e587.mp3", "I often clean my room on weekends.": "t_42a5f165f3.mp3", "Thank you for helping our community!": "t_6495cc1975.mp3", "a good doctor": "t_cec7adca49.mp3", "bus driver": "t_014a393430.mp3", "an old farmer": "t_0a9847502c.mp3", "He is tall and strong. He has short hair.": "t_ae0285e51e.mp3", "I can clean my room and sweep the floor.": "t_fbbcee1761.mp3", "I like spring best because it is green and warm.": "t_371a45305e.mp3", "We play football on the playground.": "t_b51539f787.mp3", "People help each other in our community.": "t_4b13649481.mp3", "What can you do to help at home?": "t_99c2191656.mp3", "snowy and cold": "t_d41c6e6b28.mp3", "Autumn is golden and cool.": "t_b555e6cc02.mp3", "It": "t_0d149b90e7.mp3", "Hey, Zhang Peng. We have a new classroom.": "t_cf6bbd860a.mp3", "very busy": "t_0df8e98544.mp3", "There is a nice park.": "t_a7d39bc9e2.mp3", "Put your maths book away.": "t_2077e3077b.mp3", "a brave firefighter": "t_a18228d654.mp3", "It is snowy. Let": "t_212f0ce86f.mp3", "It is a computer.": "t_ad10cd446d.mp3", "Good job! You are a helpful child.": "t_f83265fe3c.mp3", "clean the park": "t_1d40b1b0b6.mp3"};
 
@@ -1837,6 +2287,7 @@ function onJudgeResult(isCorrect) {
         userData.combo++;
         const comboBonus = Math.min(10, userData.combo * 2);
         addRewards(15, 5 + comboBonus);
+        checkRandomDrop();
 
         const boss = document.getElementById('boss-emoji');
         if (boss) {
