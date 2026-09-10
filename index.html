@@ -600,24 +600,29 @@ document.addEventListener("WeixinJSBridgeReady", function() {
 document.addEventListener("touchstart", unlockAudio, { once: true });
 document.addEventListener("click", unlockAudio, { once: true });
 
-// 屏幕发音动态波形指示器
-function showAudioIndicator(text) {
+// 屏幕发音动态波形指示器 (严密防偷看：仅展示发音状态，绝不泄露英文单词/拼写！)
+function showAudioIndicator(type = 'word') {
     let ind = document.getElementById('audio-playing-indicator');
     if (!ind) {
         ind = document.createElement('div');
         ind.id = 'audio-playing-indicator';
-        ind.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);color:#4ade80;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);z-index:99999;transition:opacity 0.25s;pointer-events:none;";
+        ind.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(15,23,42,0.92);color:#4ade80;padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,0.3);z-index:99999;transition:opacity 0.25s;pointer-events:none;";
         document.body.appendChild(ind);
     }
-    const displayText = text.length > 20 ? text.slice(0, 18) + '...' : text;
-    ind.innerHTML = '<span>🔊 正在发音:</span><span style="color:#fff;">' + displayText + '</span><span style="letter-spacing:2px;font-size:14px;">🎵🎶</span>';
+    let label = '🔊 正在播放标准原声...';
+    if (type === 'phonics') {
+        label = '👂 正在慢速拆音拼读...';
+    } else if (type === 'test') {
+        label = '🔔 正在测试音量...';
+    }
+    ind.innerHTML = '<span>' + label + '</span><span style="letter-spacing:2px;font-size:14px;">🎵🎶</span>';
     ind.style.display = 'flex';
     ind.style.opacity = '1';
 
     if (audioPlayTimer) clearTimeout(audioPlayTimer);
     audioPlayTimer = setTimeout(() => {
         if (ind) ind.style.opacity = '0';
-    }, 3500);
+    }, 3000);
 }
 
 function hideAudioIndicator() {
@@ -627,7 +632,7 @@ function hideAudioIndicator() {
 
 // 声音测试专用函数
 function testSound() {
-    playAudioItem('text', 'Hello! Welcome to English Game!', () => {
+    playAudioItem('test', 'Hello! Welcome to English Game!', () => {
         alert("🔔 测试发音播放完毕！\n\n如果屏幕有发音提示但未听到声音，请检查：\n1. 平板是否处于【静音/勿扰】模式；\n2. 请按平板物理音量键，将【媒体音量】调到最大；\n3. 检查是否误连了蓝牙耳机。");
     });
 }
@@ -639,7 +644,7 @@ function playAudioItem(type, targetText, onEndCallback = null) {
     const a = getGlobalAudio();
     if (!a) return;
 
-    showAudioIndicator(cleanText);
+    showAudioIndicator(type);
 
     // 计算音频本地路径
     let localUrl = '';
@@ -649,6 +654,8 @@ function playAudioItem(type, targetText, onEndCallback = null) {
         localUrl = 'audio/words/' + safeName + '.mp3';
     } else if (type === 'phonics') {
         localUrl = 'audio/phonics/' + safeName + '_phonics.mp3';
+    } else if (type === 'test') {
+        localUrl = 'audio/texts/' + (AUDIO_TEXT_MAP['Hello! Welcome to English Game!'] || 't_a85ad4644e.mp3');
     } else {
         const mapFile = AUDIO_TEXT_MAP[cleanText];
         if (mapFile) {
