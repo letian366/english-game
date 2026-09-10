@@ -821,13 +821,13 @@ const ITEM_DATABASE = {
     ]
 };
 
-// 随机战利品惊喜池 (包含实体特权卡)
-const SURPRISE_CARDS = [
-    { title: "免做一次家务特权卡 🧹", desc: "可抵消一次擦桌子或扫地家务！" },
-    { title: "自由游玩 20 分钟兑换卡 🎮", desc: "凭此卡找爸爸兑换 20 分钟自由游戏时间！" },
-    { title: "挑选心爱小零食一张 🍬", desc: "可自由选购一件美味小甜点或零食！" },
-    { title: "看一部精彩动画片兑换卡 🎬", desc: "周末可挑选一部心仪的大电影或动画！" },
-    { title: "神秘暴击金币大福袋 💰", desc: "直接获得 50 枚金币！", coins: 50 }
+// 随机战利品惊喜池 (纯游戏内强力魔法道具与宝物)
+const SURPRISE_ITEMS = [
+    { title: "🧪 神圣经验药水", desc: "魔力涌动！瞬间获得 +40 经验值！", xp: 40, coins: 10 },
+    { title: "💎 璀璨智慧宝石", desc: "通体透亮的知识宝石，获得 50 枚金币！", xp: 20, coins: 50 },
+    { title: "📜 双倍暴击卷轴", desc: "获得远古卷轴加护，金币+35，经验+30！", xp: 30, coins: 35 },
+    { title: "🔮 知识守护符文", desc: "抵御粗心与遗忘，金币+40，经验+25！", xp: 25, coins: 40 },
+    { title: "💰 巨龙宝藏钱袋", desc: "金光闪闪！直接获得 60 枚金币！", xp: 15, coins: 60 }
 ];
 
 let userData = {
@@ -2444,17 +2444,17 @@ function checkRoundEnd() {
 
 function openVictoryChest() {
     const rewards = [
-        "免做一次家务卡 🧹 (金币+30)",
-        "自主玩游戏 20 分钟卡 🎮 (金币+20)",
-        "挑选小零食奖励卡 🍬 (金币+25)",
-        "休息 15 分钟自由卡 ☕ (金币+20)",
-        "暴击大金币包 💰 获得 50 金币！"
+        "💎 璀璨智慧水晶 (经验+50, 金币+40)",
+        "🧪 极速晋阶圣水 (经验+60, 金币+30)",
+        "💰 讨伐巨龙大钱袋 (金币+60, 经验+30)",
+        "🔮 远古暴击符文 (经验+40, 金币+50)",
+        "👑 王者荣耀勋章 (经验+50, 金币+50)"
     ];
     const picked = rewards[Math.floor(Math.random() * rewards.length)];
-    addRewards(50, 30);
-    document.getElementById('chest-reward-box').innerHTML = '🎉 抽中契约卡片：<br><span style="color:#e11d48;font-size:18px;">' + picked + '</span>';
+    addRewards(50, 40);
+    document.getElementById('chest-reward-box').innerHTML = '🎉 黄金宝箱开启，获得战利品：<br><span style="color:#d97706;font-size:17px;font-weight:900;">' + picked + '</span>';
     const btn = document.getElementById('open-chest-btn');
-    btn.innerText = '完成讨伐，返回营地';
+    btn.innerText = '收下战利品，返回营地';
     btn.onclick = () => returnToHome();
 }
 
