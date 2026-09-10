@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>四年级英语打怪战 · 2024新课标PEP全功能版</title>
+    <style>
+        :root {
+            --primary: #2e7d32;
+            --primary-light: #4caf50;
+            --danger: #e53935;
+            --warning: #f59e0b;
+            --info: #0284c7;
+            --gold: #d97706;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #475569;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+        body { background: var(--bg); display: flex; flex-direction: column; height: 100vh; overflow: hidden; color: var(--text-main); -webkit-tap-highlight-color: transparent; }
+
+        /* 顶部玩家成长状态栏 */
+        .player-bar {
+            background: #ffffff;
+            padding: 8px 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        .player-info { display: flex; align-items: center; gap: 8px; }
+        .level-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(239,68,68,0.3);
+        }
+        .player-name { font-weight: 700; font-size: 13px; color: var(--text-main); }
+        .exp-box { width: 75px; height: 7px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 3px; }
+        .exp-fill { height: 100%; background: var(--info); width: 0%; transition: width 0.4s; }
+        .stats-right { display: flex; align-items: center; gap: 8px; }
+        .stat-item { font-size: 13px; font-weight: 800; display: flex; align-items: center; gap: 4px; }
+        .coin-pill { background: #fef3c7; color: #b45309; padding: 4px 10px; border-radius: 14px; border: 1px solid #fde68a; }
+        .combo-pill { background: #ffe4e6; color: #e11d48; padding: 4px 10px; border-radius: 14px; border: 1px solid #fecdd3; display: none; animation: pulse 0.8s infinite alternate; }
+
+        @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.06); } }
+
+        /* 主容器 */
+        .screen-container { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        #home-screen { padding: 14px; max-width: 520px; margin: 0 auto; width: 100%; }
+        
+        .hero-banner {
+            text-align: center;
+            padding: 16px 12px;
+            background: linear-gradient(135deg, #15803d, #0369a1);
+            border-radius: 16px;
+            color: white;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 14px rgba(3,105,161,0.25);
+            position: relative;
+        }
+        .hero-banner h1 { font-size: 21px; margin-bottom: 4px; font-weight: 900; letter-spacing: 0.5px; }
+        .hero-banner p { font-size: 12px; opacity: 0.92; }
+        .edition-tag {
+            display: inline-block;
+            background: #facc15;
+            color: #713f12;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-bottom: 4px;
+        }
+
+        /* 版本与模式切换 */
+        .version-switcher {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+        .version-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            padding: 6px 4px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #475569;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .version-btn.active {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        .mode-tabs { display: flex; gap: 8px; margin-bottom: 14px; }
+        .tab-btn {
+            flex: 1;
+            padding: 11px 6px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 2px solid transparent;
+            background: white;
+            color: var(--text-sub);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: #dcfce7;
+            color: var(--primary);
+            border-color: var(--primary-light);
+            box-shadow: 0 4px 10px rgba(46,125,50,0.2);
+        }
+
+        /* 单元卡片网格 */
+        .unit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .unit-card {
+            background: white;
+            padding: 14px 10px;
+            border-radius: 14px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            text-align: left;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.03);
+            transition: all 0.15s;
+        }
+        .unit-card:active { transform: scale(0.97); }
+        .unit-badge { font-size: 11px; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 2px 6px; border-radius: 6px; display: inline-block; margin-bottom: 4px; }
+        .unit-title { font-size: 14px; font-weight: 800; color: var(--text-main); margin-bottom: 3px; line-height: 1.3; }
+        .unit-desc { font-size: 11px; color: var(--text-sub); }
+
+        /* 战斗主屏 */
+        #game-screen { display: none; flex-direction: column; height: 100%; background: #fff; }
+        .game-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .nav-btn { background: none; border: none; font-size: 22px; cursor: pointer; padding: 4px 8px; color: #555; }
+        .stage-title { font-size: 14px; font-weight: 800; color: var(--text-main); text-align: center; }
+        .hunter-btn {
+            background: #f1f5f9;
+            color: #334155;
+            border: none;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 16px;
+            cursor: pointer;
+        }
+
+        /* BOSS 与生命条 */
+        .boss-section {
+            background: linear-gradient(180deg, #f8fafc, #ffffff);
+            padding: 8px 16px 8px;
+            text-align: center;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .boss-avatar { font-size: 56px; display: inline-block; transition: transform 0.15s; }
+        .shake-hit { animation: bossDamage 0.25s ease-in-out; }
+        @keyframes bossDamage {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(-10px, 3px) rotate(-6deg) scale(0.92); }
+            60% { transform: translate(10px, -3px) rotate(6deg) scale(1.04); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+        .boss-hp-wrap {
+            width: 80%;
+            max-width: 280px;
+            height: 14px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            margin: 4px auto 3px;
+            overflow: hidden;
+            border: 2px solid #cbd5e1;
+        }
+        .boss-hp-bar { height: 100%; background: linear-gradient(90deg, #ef4444, #dc2626); width: 100%; transition: width 0.3s; }
+        .boss-hp-label { font-size: 11px; font-weight: 700; color: #64748b; }
+
+        /* 答题区 */
+        .stage-scroll { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; align-items: center; }
+        .prompt-tag { font-size: 12px; color: #64748b; margin-bottom: 6px; font-weight: 700; }
+        .chinese-meaning { font-size: 30px; font-weight: 900; color: #0f172a; margin-bottom: 12px; text-align: center; }
+
+        /* 听音拼读工具区 */
+        .pre-listen-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            width: 100%;
+            max-width: 360px;
+            justify-content: center;
+        }
+        .listen-btn {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #7dd3fc;
+            padding: 9px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.15s;
+        }
+        .listen-btn:active { transform: scale(0.95); }
+        .listen-btn.phonics { background: #fae8ff; color: #a21caf; border-color: #f0abfc; }
+
+        /* 答案卡片与杨妈拼读 */
+        .answer-card {
+            width: 100%;
+            max-width: 420px;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+            display: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        .revealed-word-box {
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 10px;
+        }
+        .revealed-word {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+        .syllable-split {
+            font-size: 15px;
+            font-weight: 700;
+            color: #334155;
+            background: #f8fafc;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .syllable-split span.vowel { color: #e11d48; text-decoration: underline; font-weight: 800; }
+
+        .yang-rule-box {
+            background: #fefce8;
+            border: 1px solid #fef08a;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
+        }
+        .rule-title { font-size: 12px; font-weight: 800; color: #a16207; margin-bottom: 5px; }
+        .rule-item { font-size: 12px; color: #713f12; line-height: 1.45; margin-bottom: 3px; }
+
+        .read-spell-action {
+            display: flex;
+            justify-content: space-around;
+            background: #f1f5f9;
+            padding: 8px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .action-voice-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 6px 12px;
+            border-radius: 18px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* 课文卡片 */
+        .textbook-card {
+            background: #f0fdf4;
+            border: 2px dashed #86efac;
+            border-radius: 14px;
+            padding: 14px;
+            margin: 10px 0;
+            text-align: left;
+            width: 100%;
+            max-width: 420px;
+        }
+        .textbook-sentence { font-size: 17px; font-weight: 800; color: #166534; line-height: 1.45; margin-bottom: 6px; }
+        .textbook-cn { font-size: 13px; color: #15803d; }
+
+        /* 底部控制栏 */
+        .control-panel {
+            padding: 12px 16px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            max-width: 480px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        .btn-large {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 800;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            transition: all 0.15s;
+        }
+        .btn-large:active { transform: scale(0.98); }
+        .btn-show-ans { background: linear-gradient(135deg, #0284c7, #0ea5e9); color: white; }
+        .judge-btns { display: none; gap: 10px; width: 100%; }
+        .btn-wrong { background: #f59e0b; color: white; flex: 1; }
+        .btn-correct { background: linear-gradient(135deg, #15803d, #22c55e); color: white; flex: 1.3; }
+
+        /* 弹窗 */
+        .modal-mask {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(2px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 16px;
+        }
+        .modal-body {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 18px;
+            padding: 20px 16px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            animation: modalPop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalPop { from { transform: scale(0.88); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-title { font-size: 19px; font-weight: 900; margin-bottom: 6px; }
+        .combo-content {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            text-align: left;
+            margin: 12px 0;
+            font-size: 13px;
+        }
+        .combo-line { margin-bottom: 6px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部状态栏 -->
+    <div class="player-bar">
+        <div class="player-info">
+            <span class="level-badge" id="player-level-tag">Lv.1 见习小猎人</span>
+            <div>
+                <div class="player-name">PEP新课标勇者</div>
+                <div class="exp-box"><div class="exp-fill" id="exp-fill-bar"></div></div>
+            </div>
+        </div>
+        <div class="stats-right">
+            <div class="stat-item combo-pill" id="combo-badge">🔥 <span id="combo-num">0</span>连击</div>
+            <div class="stat-item coin-pill">💰 <span id="coin-count">0</span></div>
+        </div>
+    </div>
+
+    <!-- 屏幕容器 -->
+    <div class="screen-container">
+
+        <!-- 首页关卡选择 -->
+        <div id="home-screen">
+            <div class="hero-banner">
+                <span class="edition-tag">✨ 2024审定 · 2022新课标教材</span>
+                <h1>⚔️ PEP英语打怪战 · 四年级上</h1>
+                <p>听音能写 · 见词能读 · 课文背诵攻擂</p>
+            </div>
+
+            <!-- 教材版本切换 -->
+            <div class="version-switcher">
+                <button class="version-btn active" id="btn-v-new" onclick="setCurriculumVersion('new')">
+                    🌟 2024/2025新课标版 (当前正课)
+                </button>
+                <button class="version-btn" id="btn-v-old" onclick="setCurriculumVersion('old')">
+                    📜 2013老版人教PEP (备用)
+                </button>
+            </div>
+
+            <!-- 模式选择 Tab -->
+            <div class="mode-tabs">
+                <button class="tab-btn active" id="tab-words" onclick="switchMode('words')">🗡️ 单词自然拼读</button>
+                <button class="tab-btn" id="tab-texts" onclick="switchMode('texts')">📜 课文背诵秘境</button>
+            </div>
+
+            <!-- 关卡网格 (动态渲染当前版本) -->
+            <div class="unit-grid" id="unit-selection-grid"></div>
+        </div>
+
+        <!-- 游戏战斗界面 -->
+        <div id="game-screen">
+            <div class="game-nav">
+                <button class="nav-btn" onclick="returnToHome()">🏠</button>
+                <div class="stage-title" id="stage-title-text">Unit 1 挑战中</div>
+                <button class="hunter-btn" onclick="openMistakeBag()">🎒 错题本 (<span id="mistake-badge">0</span>)</button>
+            </div>
+
+            <!-- BOSS 区域 -->
+            <div class="boss-section">
+                <div class="boss-avatar" id="boss-emoji">🐉</div>
+                <div class="boss-hp-wrap"><div class="boss-hp-bar" id="boss-hp-bar"></div></div>
+                <div class="boss-hp-label">魔物剩余生命值: <span id="boss-hp-val">100</span></div>
+            </div>
+
+            <!-- 舞台内容区 -->
+            <div class="stage-scroll">
+                <div class="prompt-tag" id="prompt-tag-text">✏️ 请在草稿纸上拼写默出：</div>
+                <div class="chinese-meaning" id="main-prompt-text">医生</div>
+
+                <!-- 听音与提示工具区 -->
+                <div class="pre-listen-box" id="pre-listen-area">
+                    <button class="listen-btn phonics" id="btn-hint-phonics" onclick="playCurrentPhonicsSlow()">
+                        👂 听杨妈拆音拼读
+                    </button>
+                    <button class="listen-btn" id="btn-hint-standard" onclick="playCurrentStandard()">
+                        🔊 标准读音
+                    </button>
+                </div>
+
+                <!-- 答案与杨妈自然拼读卡片 -->
+                <div class="answer-card" id="answer-card">
+                    <div class="revealed-word-box">
+                        <div class="revealed-word" id="revealed-word-text">doctor</div>
+                        <div class="syllable-split" id="syllable-split-text">
+                            doc · tor
+                        </div>
+                    </div>
+
+                    <!-- 杨妈法则解析 -->
+                    <div class="yang-rule-box">
+                        <div class="rule-title">💡 杨妈自然拼读核心法则</div>
+                        <div class="rule-item" id="phonics-rule-vowel">核心元音：o发短元音/ɒ/，职业后缀 or 发/tə/</div>
+                        <div class="rule-item" id="phonics-rule-chunk">音块拆分：doc + tor，听音自然连出</div>
+                        <div class="rule-item" id="phonics-rule-trap" style="color:#b91c1c;font-weight:700;">破绽防坑：结尾职业后缀是 or，千万别拼成 er！</div>
+                    </div>
+
+                    <!-- 读拼互动 -->
+                    <div class="read-spell-action">
+                        <button class="action-voice-btn" onclick="playCurrentStandard()">🔊 听整词发音</button>
+                        <button class="action-voice-btn" onclick="playCurrentPhonicsSlow()">🧩 听音节拼读</button>
+                    </div>
+                </div>
+
+                <!-- 课文纯背诵核对卡片 -->
+                <div class="textbook-card" id="textbook-reveal-card" style="display:none;">
+                    <div style="font-size:12px;font-weight:800;color:#15803d;margin-bottom:6px;">📖 课文英文原句：</div>
+                    <div class="textbook-sentence" id="textbook-en-text">What can you do to help at home?</div>
+                    <div class="textbook-cn" id="textbook-cn-text">你能做些什么家务来帮家里呢？</div>
+                    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+                        <button class="action-voice-btn" onclick="playCurrentStandard()">🔊 听标准原声领读</button>
+                        <button class="action-voice-btn" onclick="playCurrentSlow()">🐢 慢速逐词跟读</button>
+                    </div>
+                    <div style="font-size:11px;color:#166534;margin-top:8px;background:#dcfce7;padding:6px 10px;border-radius:6px;">
+                        💡 <strong>背诵指引</strong>：大声跟读 1 遍，自己再脱稿背诵 1 遍，确认流利即可刺击魔物！
+                    </div>
+                </div>
+            </div>
+
+            <!-- 底部操作按钮 -->
+            <div class="control-panel">
+                <button class="btn-large btn-show-ans" id="btn-show-answer" onclick="revealAnswer()">
+                    👀 纸上默写好了，对答案
+                </button>
+                <div class="judge-btns" id="judge-btn-group">
+                    <button class="btn-large btn-wrong" id="btn-judge-wrong" onclick="onJudgeResult(false)">❌ 拼错了</button>
+                    <button class="btn-large btn-correct" id="btn-judge-correct" onclick="onJudgeResult(true)">🗡️ 击中！完全正确</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 弹窗 -->
+    <div class="modal-mask" id="game-modal">
+        <div class="modal-body" id="modal-body-content"></div>
+    </div>
+
+<script>
+/* ==================== 1. 本地存储与用户成长系统 ==================== */
+const USER_KEY = 'rocky_pep_english_v2';
+let userData = {
+    xp: 0,
+    coins: 0,
+    level: 1,
+    combo: 0,
+    mistakes: []
+};
+
+function loadUserData() {
+    try {
+        const saved = localStorage.getItem(USER_KEY);
+        if (saved) userData = Object.assign(userData, JSON.parse(saved));
+    } catch(e){}
+    updatePlayerBar();
+}
+
+function saveUserData() {
+    try { localStorage.setItem(USER_KEY, JSON.stringify(userData)); } catch(e){}
+}
+
+function addRewards(earnedXp, earnedCoins) {
+    userData.xp += earnedXp;
+    userData.coins += earnedCoins;
+    const newLevel = Math.floor(userData.xp / 100) + 1;
+    if (newLevel > userData.level) {
+        userData.level = newLevel;
+        playLevelUpAudio();
+        alert('🎉 恭喜升级！当前等级：Lv.' + userData.level + ' ' + getLevelTitle(userData.level));
+    }
+    saveUserData();
+    updatePlayerBar();
+}
+
+function getLevelTitle(lvl) {
+    if (lvl >= 8) return '绝世背诵宗师 👑';
+    if (lvl >= 6) return '钻石单词大师 💎';
+    if (lvl >= 4) return '黄金语感剑圣 ⚔️';
+    if (lvl >= 2) return '拼读小先锋 🏹';
+    return '见习小猎人 🛡️';
+}
+
+function updatePlayerBar() {
+    document.getElementById('player-level-tag').innerText = 'Lv.' + userData.level + ' ' + getLevelTitle(userData.level);
+    document.getElementById('coin-count').innerText = userData.coins;
+    document.getElementById('exp-fill-bar').style.width = (userData.xp % 100) + '%';
+    const comboBadge = document.getElementById('combo-badge');
+    if (userData.combo >= 2) {
+        comboBadge.style.display = 'flex';
+        document.getElementById('combo-num').innerText = userData.combo;
+    } else {
+        comboBadge.style.display = 'none';
+    }
+    document.getElementById('mistake-badge').innerText = userData.mistakes.length;
+}
+
+/* ==================== 2. Web Speech & Web Audio 离线音频 ==================== */
+const synth = window.speechSynthesis;
+let currentVoice = null;
+function initVoice() {
+    if (!synth) return;
+    const voices = synth.getVoices();
+    currentVoice = voices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha')))
+                || voices.find(v => v.lang.startsWith('en')) || null;
+}
+if (synth) { synth.onvoiceschanged = initVoice; initVoice(); }
+
+function speakWordStandard(text) {
+    if (!synth) return;
+    synth.cancel();
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'en-US';
+    utter.rate = 0.85;
+    if (currentVoice) utter.voice = currentVoice;
+    synth.speak(utter);
+}
+
+function speakWordPhonics(phonicsArray, finalWord) {
+    if (!synth) return;
+    synth.cancel();
+    const slowText = phonicsArray.join(' ... ') + ' ... ' + finalWord;
+    const utter = new SpeechSynthesisUtterance(slowText);
+    utter.lang = 'en-US';
+    utter.rate = 0.68;
+    if (currentVoice) utter.voice = currentVoice;
+    synth.speak(utter);
+}
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playHitAudio() {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(160, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+    gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.2);
+}
+
+function playLevelUpAudio() {
+    if (!audioCtx) return;
+    [300, 400, 500, 700].forEach((freq, idx) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = freq;
+        gain.gain.value = 0.2;
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + idx * 0.1);
+        osc.stop(audioCtx.currentTime + idx * 0.1 + 0.15);
+    });
+}
+
+/* ==================== 3. 2024新课标版 PEP 核心数据库 ==================== */
+const newCurriculumWords = {
+    new_u1: [
+        {
+            word: "doctor", meaning: "医生",
+            syllables: ["doc", "tor"],
+            coloredSyllables: 'd<span class="vowel">o</span>c · t<span class="vowel">or</span>',
+            vowelRule: "核心元音：o发/ɒ/，职业后缀 or 发/tə/",
+            chunkRule: "音节拆解：doc(辅元辅) + tor，两拍读准",
+            trapRule: "破绽提示：结尾是 or 不是 er！",
+            level2: "a good doctor", level3: "My father is a doctor."
+        },
+        {
+            word: "nurse", meaning: "护士",
+            syllables: ["nurse"],
+            coloredSyllables: 'n<span class="vowel">ur</span>s<span class="vowel">e</span>',
+            vowelRule: "核心元音：ur组合卷舌发长音/ɜː/",
+            chunkRule: "音节拆解：n + ur + se，一气呵成",
+            trapRule: "破绽提示：末尾有不发音的 e，不要漏掉",
+            level2: "a kind nurse", level3: "She is a kind nurse."
+        },
+        {
+            word: "farmer", meaning: "农民",
+            syllables: ["far", "mer"],
+            coloredSyllables: 'f<span class="vowel">ar</span> · m<span class="vowel">er</span>',
+            vowelRule: "核心元音：ar组合大口发/ɑː/，er发弱读/ə/",
+            chunkRule: "音节拆解：farm(农场) + er(人) = 农民",
+            trapRule: "破绽提示：ar 组合别写成 er",
+            level2: "an old farmer", level3: "My grandfather is a farmer."
+        },
+        {
+            word: "cook", meaning: "做饭；厨师",
+            syllables: ["cook"],
+            coloredSyllables: 'c<span class="vowel">oo</span>k',
+            vowelRule: "核心元音：oo在k前发短音/ʊ/",
+            chunkRule: "音节拆解：c + oo + k，听音直出",
+            trapRule: "破绽提示：cook 既表示做饭，也直接表示厨师(不要写成cooker)",
+            level2: "cook dinner", level3: "I can cook dinner for my family."
+        },
+        {
+            word: "clean", meaning: "打扫；干净的",
+            syllables: ["clean"],
+            coloredSyllables: 'cl<span class="vowel">ea</span>n',
+            vowelRule: "核心元音：ea组合发长元音/i:/",
+            chunkRule: "音节拆解：cl(连缀) + ea + n",
+            trapRule: "破绽提示：中间是 ea，不要写成 ee",
+            level2: "clean the room", level3: "I often clean my room on weekends."
+        },
+        {
+            word: "sweep", meaning: "扫除；打扫",
+            syllables: ["sweep"],
+            coloredSyllables: 'sw<span class="vowel">ee</span>p',
+            vowelRule: "核心元音：ee黄金组合发长音/i:/",
+            chunkRule: "音节拆解：sw + ee + p",
+            trapRule: "破绽提示：sweep 是双 e，常考短语 sweep the floor",
+            level2: "sweep the floor", level3: "Let me sweep the floor."
+        },
+        {
+            word: "busy", meaning: "忙碌的",
+            syllables: ["bu", "sy"],
+            coloredSyllables: 'b<span class="vowel">u</span> · s<span class="vowel">y</span>',
+            vowelRule: "核心元音：u特殊发/ɪ/，y发/i/",
+            chunkRule: "音节拆解：bu + sy",
+            trapRule: "破绽提示：中间字母是 u 不是 i，发音像 /'bɪzi/",
+            level2: "very busy", level3: "My mother is very busy today."
+        },
+        {
+            word: "tired", meaning: "疲劳的，累的",
+            syllables: ["tired"],
+            coloredSyllables: 't<span class="vowel">ire</span>d',
+            vowelRule: "核心元音：ire组合发/aɪə/",
+            chunkRule: "音节拆解：t + ire + d",
+            trapRule: "破绽提示：字母 i 发字母本身音，末尾有 d",
+            level2: "feel tired", level3: "Dad is tired after work."
+        }
+    ],
+    new_u2: [
+        {
+            word: "friend", meaning: "朋友",
+            syllables: ["friend"],
+            coloredSyllables: 'fr<span class="vowel">ie</span>nd',
+            vowelRule: "核心元音：ie组合特殊发短音/e/",
+            chunkRule: "音节拆解：fr + ie + nd",
+            trapRule: "破绽提示：口诀“我和朋友在周五”，i 在 e 前面！",
+            level2: "a good friend", level3: "Zhang Peng is my good friend."
+        },
+        {
+            word: "tall", meaning: "高的",
+            syllables: ["tall"],
+            coloredSyllables: 't<span class="vowel">all</span>',
+            vowelRule: "核心元音：all黄金组合发长音/ɔːl/",
+            chunkRule: "音节拆解：t + all (ball/call/tall系列词)",
+            trapRule: "破绽提示：双写 l，不要只写一个",
+            level2: "tall and strong", level3: "He is tall and strong."
+        },
+        {
+            word: "strong", meaning: "强壮的",
+            syllables: ["strong"],
+            coloredSyllables: 'str<span class="vowel">o</span>ng',
+            vowelRule: "核心元音：o发/ɒ/，ng发后鼻音/ŋ/",
+            chunkRule: "音节拆解：str(辅音三连缀) + ong",
+            trapRule: "破绽提示：str 千万别漏掉中间的 r！",
+            level2: "very strong", level3: "My friend is very strong."
+        },
+        {
+            word: "quiet", meaning: "安静的",
+            syllables: ["qui", "et"],
+            coloredSyllables: 'q<span class="vowel">ui</span> · <span class="vowel">et</span>',
+            vowelRule: "核心元音：qu组合发/kw/，i发/aɪ/，et发/ət/",
+            chunkRule: "音节拆解：qui + et，分步读准",
+            trapRule: "破绽提示：quiet 结尾是 et，千万别写成 quite(相当)",
+            level2: "a quiet girl", level3: "She is quiet and friendly."
+        },
+        {
+            word: "hair", meaning: "头发",
+            syllables: ["hair"],
+            coloredSyllables: 'h<span class="vowel">air</span>',
+            vowelRule: "核心元音：air固定发长音/eə/",
+            chunkRule: "音节拆解：h + air，一步到位",
+            trapRule: "破绽提示：air 组合别拆成 are 或 ar",
+            level2: "short hair", level3: "He has short black hair."
+        },
+        {
+            word: "glasses", meaning: "眼镜",
+            syllables: ["glas", "ses"],
+            coloredSyllables: 'gl<span class="vowel">a</span>s · s<span class="vowel">es</span>',
+            vowelRule: "核心元音：a发/ɑː/，es发/ɪz/",
+            chunkRule: "音节拆解：glass(玻璃) + es(复数眼镜有两个镜片)",
+            trapRule: "破绽提示：单数末尾是 ss，复数必加 es",
+            level2: "blue glasses", level3: "He has blue glasses."
+        }
+    ],
+    new_u3: [
+        {
+            word: "community", meaning: "社区",
+            syllables: ["com", "mu", "ni", "ty"],
+            coloredSyllables: 'c<span class="vowel">o</span>m · m<span class="vowel">u</span> · n<span class="vowel">i</span> · t<span class="vowel">y</span>',
+            vowelRule: "核心元音：u发/juː/，末尾y发短音/i/",
+            chunkRule: "音节拆解：四音节 com + mu + ni + ty，四拍读完",
+            trapRule: "破绽提示：中间是双写 m，听音节分段写",
+            level2: "our community", level3: "Welcome to our community."
+        },
+        {
+            word: "playground", meaning: "操场；游乐场",
+            syllables: ["play", "ground"],
+            coloredSyllables: 'pl<span class="vowel">ay</span> · gr<span class="vowel">ou</span>nd',
+            vowelRule: "核心元音：ay发/eɪ/，ou发/aʊ/",
+            chunkRule: "音节拆解：play(玩耍) + ground(地面/场地)，合成词",
+            trapRule: "破绽提示：连写无空格，ground 里有字母 u",
+            level2: "on the playground", level3: "We play football on the playground."
+        },
+        {
+            word: "park", meaning: "公园",
+            syllables: ["park"],
+            coloredSyllables: 'p<span class="vowel">ar</span>k',
+            vowelRule: "核心元音：ar组合张大嘴发长音/ɑː/",
+            chunkRule: "音节拆解：p + ar + k (car/star/park系列)",
+            trapRule: "破绽提示：ar 组合，末尾是字母 k 不是 c",
+            level2: "in the park", level3: "There is a nice park."
+        },
+        {
+            word: "hospital", meaning: "医院",
+            syllables: ["hos", "pi", "tal"],
+            coloredSyllables: 'h<span class="vowel">o</span>s · p<span class="vowel">i</span> · t<span class="vowel">al</span>',
+            vowelRule: "核心元音：o发/ɒ/，i发/ɪ/，al发/l/",
+            chunkRule: "音节拆解：hos + pi + tal 三音节清晰有力",
+            trapRule: "破绽提示：结尾是 tal，不要写成 tol",
+            level2: "pet hospital", level3: "There is a pet hospital near my home."
+        },
+        {
+            word: "building", meaning: "建筑物；楼房",
+            syllables: ["buil", "ding"],
+            coloredSyllables: 'b<span class="vowel">uil</span> · d<span class="vowel">ing</span>',
+            vowelRule: "核心元音：ui发/ɪ/，ing发/ɪŋ/",
+            chunkRule: "音节拆解：build(建造) + ing(名词后缀)",
+            trapRule: "破绽提示：build 里有不发音的 u，别漏写 u",
+            level2: "a tall building", level3: "Look at that tall building."
+        },
+        {
+            word: "near", meaning: "在……附近",
+            syllables: ["near"],
+            coloredSyllables: 'n<span class="vowel">ear</span>',
+            vowelRule: "核心元音：ear组合发/ɪə/",
+            chunkRule: "音节拆解：n + ear (hear/dear/near系列)",
+            trapRule: "破绽提示：ear 组合发音，别写成 eer",
+            level2: "near the park", level3: "The shop is near the park."
+        }
+    ],
+    new_u4: [
+        {
+            word: "firefighter", meaning: "消防员",
+            syllables: ["fi", "re", "figh", "ter"],
+            coloredSyllables: 'f<span class="vowel">i</span>re · f<span class="vowel">igh</span>t<span class="vowel">er</span>',
+            vowelRule: "核心元音：i发/aɪ/，igh发/aɪ/，er发/ə/",
+            chunkRule: "音节拆解：fire(火) + fight(战斗) + er(人) = 救火勇士",
+            trapRule: "破绽提示：合成词连写，fight 里有不发音的 gh",
+            level2: "a brave firefighter", level3: "My uncle is a firefighter."
+        },
+        {
+            word: "driver", meaning: "司机",
+            syllables: ["dri", "ver"],
+            coloredSyllables: 'dr<span class="vowel">i</span> · v<span class="vowel">er</span>',
+            vowelRule: "核心元音：i发字母长音/aɪ/，er发/ə/",
+            chunkRule: "音节拆解：drive(驾驶)去e加er",
+            trapRule: "破绽提示：结尾职业后缀是 er 不是 or",
+            level2: "bus driver", level3: "He is a friendly bus driver."
+        },
+        {
+            word: "police", meaning: "警察",
+            syllables: ["po", "lice"],
+            coloredSyllables: 'p<span class="vowel">o</span> · l<span class="vowel">ice</span>',
+            vowelRule: "核心元音：o发弱音/ə/，ice特殊发/iːs/",
+            chunkRule: "音节拆解：po + lice",
+            trapRule: "破绽提示：结尾是 ce 发 /s/，常用 police officer",
+            level2: "police officer", level3: "My aunt is a police officer."
+        },
+        {
+            word: "help", meaning: "帮助",
+            syllables: ["help"],
+            coloredSyllables: 'h<span class="vowel">e</span>lp',
+            vowelRule: "核心元音：e发/e/",
+            chunkRule: "音节拆解：h + e + lp",
+            trapRule: "破绽提示：辅音连缀 lp 结尾",
+            level2: "help each other", level3: "We should help each other."
+        },
+        {
+            word: "important", meaning: "重要的",
+            syllables: ["im", "por", "tant"],
+            coloredSyllables: '<span class="vowel">im</span> · p<span class="vowel">or</span> · t<span class="vowel">ant</span>',
+            vowelRule: "核心元音：or发长音/ɔː/，ant发弱读/ənt/",
+            chunkRule: "音节拆解：im + por + tant，三拍分明",
+            trapRule: "破绽提示：结尾是 ant 不是 ent！",
+            level2: "an important job", level3: "That is an important job."
+        },
+        {
+            word: "clean", meaning: "打扫；清洁",
+            syllables: ["clean"],
+            coloredSyllables: 'cl<span class="vowel">ea</span>n',
+            vowelRule: "核心元音：ea发长音/i:/",
+            chunkRule: "音节拆解：cl + ea + n",
+            trapRule: "破绽提示：ea 组合不要写成 ee",
+            level2: "clean the park", level3: "Let's clean the park together."
+        }
+    ],
+    new_u5: [
+        {
+            word: "weather", meaning: "天气",
+            syllables: ["wea", "ther"],
+            coloredSyllables: 'w<span class="vowel">ea</span> · th<span class="vowel">er</span>',
+            vowelRule: "核心元音：ea特殊发短音/e/，th咬舌/ð/，er发/ə/",
+            chunkRule: "音节拆解：wea + ther",
+            trapRule: "破绽提示：ea 别漏写，th 是咬舌音",
+            level2: "fine weather", level3: "What's the weather like today?"
+        },
+        {
+            word: "sunny", meaning: "晴朗的",
+            syllables: ["sun", "ny"],
+            coloredSyllables: 's<span class="vowel">u</span>n · n<span class="vowel">y</span>',
+            vowelRule: "核心元音：u发短元音/ʌ/，y发/i/",
+            chunkRule: "音节拆解：sun(太阳) + 双写n + y",
+            trapRule: "破绽提示：辅元辅双写结尾辅音字母 n",
+            level2: "a sunny day", level3: "It is sunny and warm."
+        },
+        {
+            word: "cloudy", meaning: "多云的",
+            syllables: ["clou", "dy"],
+            coloredSyllables: 'cl<span class="vowel">ou</span> · d<span class="vowel">y</span>',
+            vowelRule: "核心元音：ou组合发双元音/aʊ/",
+            chunkRule: "音节拆解：cloud(云朵) + y(形容词后缀)",
+            trapRule: "破绽提示：ou 组合别错拼成 ow",
+            level2: "cloudy today", level3: "It is cloudy today."
+        },
+        {
+            word: "windy", meaning: "有风的，刮风的",
+            syllables: ["win", "dy"],
+            coloredSyllables: 'w<span class="vowel">i</span>n · d<span class="vowel">y</span>',
+            vowelRule: "核心元音：i发短音/ɪ/，y发/i/",
+            chunkRule: "音节拆解：wind(风) + y(后缀)",
+            trapRule: "破绽提示：wind+y，听音直接写出",
+            level2: "windy and cool", level3: "It's windy outside. Hold on to your hat."
+        },
+        {
+            word: "rainy", meaning: "下雨的，多雨的",
+            syllables: ["rai", "ny"],
+            coloredSyllables: 'r<span class="vowel">ai</span> · n<span class="vowel">y</span>',
+            vowelRule: "核心元音：ai黄金组合发字母音/eɪ/",
+            chunkRule: "音节拆解：rain(雨水) + y",
+            trapRule: "破绽提示：ai 组合别写成 ay 或 a",
+            level2: "a rainy morning", level3: "It is rainy. Take an umbrella."
+        },
+        {
+            word: "snowy", meaning: "下雪的",
+            syllables: ["snow", "y"],
+            coloredSyllables: 'sn<span class="vowel">ow</span> · <span class="vowel">y</span>',
+            vowelRule: "核心元音：ow组合发/əʊ/",
+            chunkRule: "音节拆解：snow(雪花) + y",
+            trapRule: "破绽提示：snow 后面直接加 y",
+            level2: "snowy and cold", level3: "It is snowy. Let's make a snowman."
+        }
+    ],
+    new_u6: [
+        {
+            word: "spring", meaning: "春天",
+            syllables: ["spring"],
+            coloredSyllables: 'spr<span class="vowel">i</span>ng',
+            vowelRule: "核心元音：i发/ɪ/，ng发后鼻音/ŋ/",
+            chunkRule: "音节拆解：spr(辅音三连缀) + ing",
+            trapRule: "破绽提示：spr 别漏掉中间的 r",
+            level2: "in spring", level3: "Spring is green and warm."
+        },
+        {
+            word: "summer", meaning: "夏天",
+            syllables: ["sum", "mer"],
+            coloredSyllables: 's<span class="vowel">u</span>m · m<span class="vowel">er</span>',
+            vowelRule: "核心元音：u发/ʌ/，er发/ə/",
+            chunkRule: "音节拆解：sum + mer",
+            trapRule: "破绽提示：中间是双写 m，别漏掉一个 m",
+            level2: "in summer", level3: "It is hot in summer. I like swimming."
+        },
+        {
+            word: "autumn", meaning: "秋天",
+            syllables: ["au", "tumn"],
+            coloredSyllables: '<span class="vowel">au</span> · t<span class="vowel">u</span>mn',
+            vowelRule: "核心元音：au大口长音/ɔː/，mn组合中n不发音",
+            chunkRule: "音节拆解：au + tumn",
+            trapRule: "破绽提示：结尾的字母 n 绝对不发音，但必须书写！",
+            level2: "in autumn", level3: "Autumn is golden and cool."
+        },
+        {
+            word: "winter", meaning: "冬天",
+            syllables: ["win", "ter"],
+            coloredSyllables: 'w<span class="vowel">i</span>n · t<span class="vowel">er</span>',
+            vowelRule: "核心元音：i发短音/ɪ/，er发/ə/",
+            chunkRule: "音节拆解：win + ter，两拍稳稳拼出",
+            trapRule: "破绽提示：结尾是 ter，不要写成 tar",
+            level2: "in winter", level3: "It is white in winter."
+        },
+        {
+            word: "season", meaning: "季节",
+            syllables: ["sea", "son"],
+            coloredSyllables: 's<span class="vowel">ea</span> · s<span class="vowel">on</span>',
+            vowelRule: "核心元音：ea发长音/i:/，on弱读/ən/",
+            chunkRule: "音节拆解：sea(海) + son(儿子) = 季节",
+            trapRule: "破绽提示：ea 发长音，巧记“海里的儿子看季节”",
+            level2: "four seasons", level3: "Which season do you like best?"
+        },
+        {
+            word: "snowman", meaning: "雪人",
+            syllables: ["snow", "man"],
+            coloredSyllables: 'sn<span class="vowel">ow</span> · m<span class="vowel">a</span>n',
+            vowelRule: "核心元音：ow发/əʊ/，a发/æ/",
+            chunkRule: "音节拆解：snow(雪) + man(人)，经典合成词",
+            trapRule: "破绽提示：合成词连写无空格",
+            level2: "make a snowman", level3: "I can make a snowman in winter."
+        }
+    ]
+};
+
+/* ==================== 4. 2024新课标版 PEP 课文背诵秘境数据库 ==================== */
+const newCurriculumTexts = {
+    new_u1: [
+        { en: "What's your father's job?", cn: "你爸爸是做什么工作的？" },
+        { en: "He is a doctor. He is very busy.", cn: "他是一名医生。他非常忙碌。" },
+        { en: "What can you do to help at home?", cn: "你能做些什么家务来帮家里呢？" },
+        { en: "I can clean my room and sweep the floor.", cn: "我可以打扫自己的房间并且扫地。" },
+        { en: "Good job! You are a helpful child.", cn: "太棒了！你真是个乐于助人的好孩子。" },
+        { en: "My mother is tired. I can make a cup of tea for her.", cn: "妈妈累了。我可以为她泡一杯茶。" }
+    ],
+    new_u2: [
+        { en: "Mum, I have a good friend in our new class.", cn: "妈妈，在我们新班级里我有一个好朋友。" },
+        { en: "Really? What's his name?", cn: "真的吗？他叫什么名字？" },
+        { en: "His name is Mike. He is very friendly.", cn: "他叫迈克。他非常友好。" },
+        { en: "Is he tall or short?", cn: "他是高还是矮呢？" },
+        { en: "He is tall and strong. He has short hair.", cn: "他又高又壮。他留着短头发。" },
+        { en: "Look! He has blue glasses and a brown hat.", cn: "看！他戴着蓝色眼镜和一顶棕色帽子。" }
+    ],
+    new_u3: [
+        { en: "Welcome to our community!", cn: "欢迎来到我们的社区！" },
+        { en: "There is a big playground and a beautiful park.", cn: "这里有一个大操场和一个美丽的公园。" },
+        { en: "I often play football there with my friends.", cn: "我经常和朋友们在那里踢足球。" },
+        { en: "Is there a hospital near your home?", cn: "你家附近有医院吗？" },
+        { en: "Yes, there is a pet hospital near the building.", cn: "有的，那栋楼房旁边就有一家宠物医院。" },
+        { en: "I love our clean and quiet community.", cn: "我喜欢我们干净又安静的社区。" }
+    ],
+    new_u4: [
+        { en: "Who is that brave man over there?", cn: "那边那位勇敢的男士是谁？" },
+        { en: "He is a firefighter. That's an important job!", cn: "他是一名消防员。那是一份非常重要的工作！" },
+        { en: "People help each other in our community.", cn: "在我们的社区里，大家互相帮助。" },
+        { en: "What can we do to help today?", cn: "我们今天能做些什么来帮忙呢？" },
+        { en: "Let's help clean the park and pick up the leaves.", cn: "我们来一起打扫公园，捡拾落叶吧。" },
+        { en: "Thank you for helping our community!", cn: "谢谢你们为社区提供帮助！" }
+    ],
+    new_u5: [
+        { en: "Good morning! What's the weather like today?", cn: "早上好！今天天气怎么样？" },
+        { en: "It is sunny and warm outside.", cn: "外面天气晴朗而且很温暖。" },
+        { en: "Can we go to the park and fly a kite?", cn: "我们能去公园放风筝吗？" },
+        { en: "Yes, we can! But it will be windy in the afternoon.", cn: "可以的！不过下午风会比较大。" },
+        { en: "Look at the dark clouds. Is it going to rain?", cn: "看那些乌云。要下雨了吗？" },
+        { en: "Yes, it is rainy now. Take your umbrella.", cn: "是的，现在下雨了。带上你的雨伞。" }
+    ],
+    new_u6: [
+        { en: "There are four seasons in a year.", cn: "一年有四个季节。" },
+        { en: "Which season do you like best?", cn: "你最喜欢哪一个季节？" },
+        { en: "I like spring best because it is green and warm.", cn: "我最喜欢春天，因为春天绿意盎然又温暖。" },
+        { en: "Summer is hot, but I can go swimming and eat ice cream.", cn: "夏天很热，但我可以去游泳和吃冰淇淋。" },
+        { en: "Autumn is golden. The leaves fall down.", cn: "秋天是金黄色的。树叶落了下来。" },
+        { en: "I like winter because I can make a snowman with my friends!", cn: "我喜欢冬天，因为我可以和朋友们一起堆雪人！" }
+    ]
+};
+
+/* ==================== 5. 2013老版人教PEP备用数据 ==================== */
+const oldCurriculumWords = {
+    old_u1: [
+        { word: "classroom", meaning: "教室", syllables: ["class", "room"], coloredSyllables: '<span class="vowel">class</span> · <span class="vowel">room</span>', vowelRule: "核心元音：a发/æ/，oo发/u:/", chunkRule: "音节拆解：class(班级) + room(房间)", trapRule: "破绽提示：中间是两个 s，别漏写", level2: "a big classroom", level3: "This is my classroom." },
+        { word: "window", meaning: "窗户", syllables: ["win", "dow"], coloredSyllables: 'w<span class="vowel">i</span>n · d<span class="vowel">ow</span>', vowelRule: "核心元音：i发/ɪ/，ow发/əʊ/", chunkRule: "音节拆解：win + dow", trapRule: "破绽提示：结尾是 ow 不是 ou", level2: "clean the window", level3: "Let me clean the window." },
+        { word: "blackboard", meaning: "黑板", syllables: ["black", "board"], coloredSyllables: 'bl<span class="vowel">a</span>ck · b<span class="vowel">oar</span>d', vowelRule: "核心元音：a发/æ/，oar发/ɔː/", chunkRule: "音节拆解：black + board", trapRule: "破绽提示：black 结尾是 ck", level2: "clean the blackboard", level3: "Look at the blackboard." },
+        { word: "light", meaning: "电灯", syllables: ["light"], coloredSyllables: 'l<span class="vowel">igh</span>t', vowelRule: "核心元音：igh发长音/aɪ/", chunkRule: "音节拆解：l + igh + t", trapRule: "破绽提示：gh 是哑巴不发音", level2: "turn on the light", level3: "Turn on the light." },
+        { word: "picture", meaning: "图画", syllables: ["pic", "ture"], coloredSyllables: 'p<span class="vowel">i</span>c · <span class="vowel">ture</span>', vowelRule: "核心元音：ture发/tʃə/", chunkRule: "音节拆解：pic + ture", trapRule: "破绽提示：结尾固定后缀 ture", level2: "a nice picture", level3: "Put up the picture." },
+        { word: "computer", meaning: "计算机", syllables: ["com", "pu", "ter"], coloredSyllables: 'c<span class="vowel">o</span>m · p<span class="vowel">u</span> · t<span class="vowel">er</span>', vowelRule: "核心元音：u发/juː/", chunkRule: "音节拆解：com + pu + ter", trapRule: "破绽提示：中间是 pu 不是 po", level2: "my computer", level3: "It is a computer." }
+    ],
+    old_u2: [
+        { word: "schoolbag", meaning: "书包", syllables: ["school", "bag"], coloredSyllables: 'sch<span class="vowel">oo</span>l · b<span class="vowel">a</span>g', vowelRule: "核心元音：oo发/uː/", chunkRule: "音节拆解：school + bag", trapRule: "破绽提示：连写中间无空格", level2: "a heavy schoolbag", level3: "I have a new schoolbag." },
+        { word: "maths book", meaning: "数学书", syllables: ["maths", "book"], coloredSyllables: 'm<span class="vowel">a</span>ths · b<span class="vowel">oo</span>k', vowelRule: "核心元音：th发/θ/", chunkRule: "音节拆解：maths + book", trapRule: "破绽提示：maths 末尾有 s", level2: "a maths book", level3: "Put your maths book away." }
+    ]
+};
+const oldCurriculumTexts = {
+    old_u1: [
+        { en: "Hey, Zhang Peng. We have a new classroom.", cn: "嘿，张鹏。我们有了一间新教室。" },
+        { en: "Really? Let's go and see!", cn: "真的吗？我们去看看吧！" },
+        { en: "Let's clean the classroom.", cn: "我们来打扫教室吧。" }
+    ]
+};
+
+/* ==================== 6. 界面切换与全局状态 ==================== */
+let curVersion = 'new'; // 'new' (2024新课标) 或 'old' (2013老版)
+let curMode = 'words';   // 'words' 或 'texts'
+let currentQueue = [];
+let currentIndex = 0;
+let currentMistakesThisRound = [];
+let bossMaxHp = 100;
+let bossHp = 100;
+
+const unitMetaNew = [
+    { key: "new_u1", badge: "Unit 1", title: "Helping at home", desc: "做家务与家庭职业 (doctor, cook...)" },
+    { key: "new_u2", badge: "Unit 2", title: "My friends", desc: "外貌特征与性格 (tall, strong...)" },
+    { key: "new_u3", badge: "Unit 3", title: "Places we live in", desc: "社区与周边场所 (community, park...)" },
+    { key: "new_u4", badge: "Unit 4", title: "Helping in the community", desc: "社区互助与服务 (firefighter, help...)" },
+    { key: "new_u5", badge: "Unit 5", title: "The weather and us", desc: "天气状况与生活 (sunny, rainy...)" },
+    { key: "new_u6", badge: "Unit 6", title: "Changing for the seasons", desc: "四季更替与活动 (spring, snowman...)" }
+];
+
+const unitMetaOld = [
+    { key: "old_u1", badge: "旧版 U1", title: "My Classroom", desc: "教室设施 (classroom, window...)" },
+    { key: "old_u2", badge: "旧版 U2", title: "My Schoolbag", desc: "书包文具 (schoolbag, maths...)" }
+];
+
+function setCurriculumVersion(ver) {
+    curVersion = ver;
+    document.getElementById('btn-v-new').classList.toggle('active', ver === 'new');
+    document.getElementById('btn-v-old').classList.toggle('active', ver === 'old');
+    renderUnitSelectionGrid();
+}
+
+function switchMode(mode) {
+    curMode = mode;
+    document.getElementById('tab-words').classList.toggle('active', mode === 'words');
+    document.getElementById('tab-texts').classList.toggle('active', mode === 'texts');
+    renderUnitSelectionGrid();
+}
+
+function renderUnitSelectionGrid() {
+    const container = document.getElementById('unit-selection-grid');
+    const metaList = curVersion === 'new' ? unitMetaNew : unitMetaOld;
+    const modeName = curMode === 'words' ? '拼读战' : '背诵秘境';
+
+    container.innerHTML = metaList.map(u => `
+        <div class="unit-card" onclick="startLevel('${u.key}', '${u.title}')">
+            <span class="unit-badge">${u.badge} · ${modeName}</span>
+            <div class="unit-title">${u.title}</div>
+            <div class="unit-desc">${u.desc}</div>
+        </div>
+    `).join('');
+}
+
+function startLevel(key, title) {
+    let source;
+    if (curVersion === 'new') {
+        source = curMode === 'words' ? newCurriculumWords[key] : newCurriculumTexts[key];
+    } else {
+        source = curMode === 'words' ? oldCurriculumWords[key] : oldCurriculumTexts[key];
+    }
+
+    if (!source || source.length === 0) {
+        return alert('该单元数据暂未开放！');
+    }
+
+    currentQueue = JSON.parse(JSON.stringify(source));
+    currentIndex = 0;
+    currentMistakesThisRound = [];
+    bossMaxHp = currentQueue.length * 10;
+    bossHp = bossMaxHp;
+
+    document.getElementById('stage-title-text').innerText = title + ' (' + (curMode === 'words' ? '单词拼读' : '课文背诵') + ')';
+    document.getElementById('home-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+    document.getElementById('boss-emoji').innerText = curMode === 'words' ? '🐉' : '🧙‍♂️';
+
+    updateBossDisplay();
+    renderQuestion();
+}
+
+function updateBossDisplay() {
+    document.getElementById('boss-hp-val').innerText = bossHp;
+    const pct = Math.max(0, Math.min(100, (bossHp / bossMaxHp * 100)));
+    document.getElementById('boss-hp-bar').style.width = pct + '%';
+}
+
+function renderQuestion() {
+    if (currentIndex >= currentQueue.length) {
+        return checkRoundEnd();
+    }
+
+    const cur = currentQueue[currentIndex];
+    document.getElementById('answer-card').style.display = 'none';
+    document.getElementById('textbook-reveal-card').style.display = 'none';
+    document.getElementById('btn-show-answer').style.display = 'block';
+    document.getElementById('judge-btn-group').style.display = 'none';
+
+    const btnPhonics = document.getElementById('btn-hint-phonics');
+    const btnStandard = document.getElementById('btn-hint-standard');
+    const btnShowAnswer = document.getElementById('btn-show-answer');
+    const btnWrong = document.getElementById('btn-judge-wrong');
+    const btnCorrect = document.getElementById('btn-judge-correct');
+
+    if (curMode === 'words') {
+        // 单词模式：强调纸上默写 + 杨妈自然拼读
+        document.getElementById('prompt-tag-text').innerText = '✏️ 请在草稿纸上拼写默出：';
+        document.getElementById('main-prompt-text').innerText = cur.meaning;
+        btnPhonics.style.display = 'inline-flex';
+        btnPhonics.innerHTML = '👂 听杨妈拆音拼读';
+        btnStandard.innerHTML = '🔊 标准读音';
+        btnShowAnswer.innerText = '👀 纸上默写好了，对答案';
+        btnWrong.innerText = '❌ 拼错了';
+        btnCorrect.innerText = '🗡️ 击中！完全正确';
+    } else {
+        // 课文模式：纯大声背诵，彻底免除默写负担！
+        document.getElementById('prompt-tag-text').innerText = '🗣️ 看着中文意思，请大声背诵出英文原句：';
+        document.getElementById('main-prompt-text').innerText = cur.cn;
+        btnPhonics.style.display = 'inline-flex';
+        btnPhonics.innerHTML = '👂 想不起来？听原声提示';
+        btnStandard.innerHTML = '🐢 慢速领读一遍';
+        btnShowAnswer.innerText = '🗣️ 我大声背完了，对答案';
+        btnWrong.innerText = '⚠️ 还不熟练 / 卡壳了';
+        btnCorrect.innerText = '🗡️ 流利背出！刺击魔物';
+    }
+}
+
+function revealAnswer() {
+    const cur = currentQueue[currentIndex];
+    document.getElementById('btn-show-answer').style.display = 'none';
+    document.getElementById('judge-btn-group').style.display = 'flex';
+
+    if (curMode === 'words') {
+        const answerCard = document.getElementById('answer-card');
+        answerCard.style.display = 'block';
+        document.getElementById('revealed-word-text').innerText = cur.word;
+        document.getElementById('syllable-split-text').innerHTML = cur.coloredSyllables || cur.word;
+        document.getElementById('phonics-rule-vowel').innerText = cur.vowelRule || '核心元音发音标准';
+        document.getElementById('phonics-rule-chunk').innerText = cur.chunkRule || '音节规整清晰';
+        document.getElementById('phonics-rule-trap').innerText = cur.trapRule || '细心拼写，杜绝笔误';
+        speakWordStandard(cur.word);
+    } else {
+        const textCard = document.getElementById('textbook-reveal-card');
+        textCard.style.display = 'block';
+        document.getElementById('textbook-en-text').innerText = cur.en;
+        document.getElementById('textbook-cn-text').innerText = cur.cn;
+        // 课文揭晓答案时，自动标准示范朗读一次
+        speakWordStandard(cur.en);
+    }
+}
+
+function playCurrentStandard() {
+    const cur = currentQueue[currentIndex];
+    speakWordStandard(curMode === 'words' ? cur.word : cur.en);
+}
+
+function playCurrentSlow() {
+    const cur = currentQueue[currentIndex];
+    if (!synth) return;
+    synth.cancel();
+    const utter = new SpeechSynthesisUtterance(curMode === 'words' ? cur.word : cur.en);
+    utter.lang = 'en-US';
+    utter.rate = 0.72; // 慢速清晰
+    if (currentVoice) utter.voice = currentVoice;
+    synth.speak(utter);
+}
+
+function playCurrentPhonicsSlow() {
+    const cur = currentQueue[currentIndex];
+    if (curMode === 'words') {
+        speakWordPhonics(cur.syllables || [cur.word], cur.word);
+    } else {
+        // 课文模式下点击提示：直接听标准句子领读
+        speakWordStandard(cur.en);
+    }
+}
+
+function onJudgeResult(isCorrect) {
+    const cur = currentQueue[currentIndex];
+    if (isCorrect) {
+        bossHp = Math.max(0, bossHp - 10);
+        updateBossDisplay();
+        playHitAudio();
+        userData.combo++;
+        const comboBonus = Math.min(10, userData.combo * 2);
+        addRewards(15, 5 + comboBonus);
+
+        const boss = document.getElementById('boss-emoji');
+        boss.classList.add('shake-hit');
+        setTimeout(() => boss.classList.remove('shake-hit'), 260);
+
+        if (curMode === 'words') {
+            openModal(`
+                <h2 class="modal-title" style="color:var(--primary);">✨ 完美刺中！触发三连招</h2>
+                <p style="font-size:12px;color:#64748b;">大声把短语和造句朗读一遍！</p>
+                <div class="combo-content">
+                    <div class="combo-line"><strong>🌟 核心词：</strong> <span style="color:var(--primary);font-weight:bold;">${cur.word}</span></div>
+                    <div class="combo-line"><strong>⚡ 常用短语：</strong> ${cur.level2}</div>
+                    <div class="combo-line"><strong>🛡️ 课标造句：</strong> ${cur.level3}</div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <button class="action-voice-btn" style="margin:0 auto;" onclick="speakWordStandard('${cur.level3.replace(/'/g, "\'")}')">🔊 听例句发音</button>
+                </div>
+                <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
+                    大声读完了，下一题 ➡️
+                </button>
+            `);
+            speakWordStandard(cur.level3);
+        } else {
+            // 课文背诵成功弹窗
+            openModal(`
+                <h2 class="modal-title" style="color:var(--primary);">📜 课文一句流利背出！</h2>
+                <p style="font-size:12px;color:#16a34a;font-weight:700;">背诵语感极佳！+15 经验值，金币 +${5 + comboBonus}！</p>
+                <div class="combo-content">
+                    <div class="combo-line"><strong>📖 英文：</strong> ${cur.en}</div>
+                    <div class="combo-line"><strong>🎯 中文：</strong> ${cur.cn}</div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <button class="action-voice-btn" style="margin:0 auto;" onclick="speakWordStandard('${cur.en.replace(/'/g, "\'")}')">🔊 再次重听跟读</button>
+                </div>
+                <button class="btn-large btn-correct" onclick="closeModal(); currentIndex++; renderQuestion();">
+                    下一句继续大声背 ➡️
+                </button>
+            `);
+        }
+    } else {
+        userData.combo = 0;
+        updatePlayerBar();
+        currentMistakesThisRound.push(cur);
+
+        if (curMode === 'words') {
+            if (!userData.mistakes.find(m => m.word === cur.word)) {
+                userData.mistakes.push(cur);
+                saveUserData();
+            }
+            openModal(`
+                <h2 class="modal-title" style="color:var(--danger);">⚠️ 攻击被格挡！</h2>
+                <p style="font-size:12px;color:#64748b;">已收录进错题猎人背包。</p>
+                <div class="combo-content">
+                    <div class="combo-line" style="color:#b91c1c;"><strong>🎯 破绽点：</strong> ${cur.trapRule}</div>
+                    <div class="combo-line"><strong>💡 杨妈拼读点：</strong> ${cur.vowelRule}</div>
+                </div>
+                <button class="btn-large btn-wrong" onclick="closeModal(); currentIndex++; renderQuestion();">
+                    看清弱点，下一题 ➡️
+                </button>
+            `);
+        } else {
+            // 课文背诵卡壳弹窗：重在引导跟读与强化记忆
+            openModal(`
+                <h2 class="modal-title" style="color:var(--warning);">⚠️ 这一句卡壳了，没关系！</h2>
+                <p style="font-size:12px;color:#64748b;">跟着标准原声大声读两遍，待会儿复习挑战。</p>
+                <div class="combo-content">
+                    <div class="combo-line"><strong>📖 英文原句：</strong> ${cur.en}</div>
+                    <div class="combo-line"><strong>🎯 中文释义：</strong> ${cur.cn}</div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <button class="action-voice-btn" style="margin:0 auto;" onclick="speakWordStandard('${cur.en.replace(/'/g, "\'")}')">🔊 跟着原声读一遍</button>
+                </div>
+                <button class="btn-large btn-wrong" onclick="closeModal(); currentIndex++; renderQuestion();">
+                    记在脑海中，下一句 ➡️
+                </button>
+            `);
+            speakWordStandard(cur.en);
+        }
+    }
+}
+
+function checkRoundEnd() {
+    if (bossHp <= 0) {
+        document.getElementById('boss-emoji').innerText = '💀';
+        openModal(`
+            <div style="font-size:50px;margin-bottom:4px;">🏆</div>
+            <h2 class="modal-title" style="color:#d97706;">魔物被彻底讨伐！</h2>
+            <p style="font-size:13px;color:#64748b;margin-bottom:14px;">全部答对攻克，开启通关宝箱！</p>
+            <div id="chest-reward-box" style="font-size:16px;font-weight:800;color:var(--primary);padding:12px;background:#f0fdf4;border-radius:10px;margin-bottom:14px;">
+                🎁 点击下方试试手气开宝箱
+            </div>
+            <button class="btn-large btn-correct" id="open-chest-btn" onclick="openVictoryChest()">
+                🎲 开启黄金宝箱
+            </button>
+        `);
+    } else {
+        alert('本轮有 ' + currentMistakesThisRound.length + ' 题未击中！立刻开启【弱点复仇重练】！');
+        currentQueue = [...currentMistakesThisRound];
+        currentMistakesThisRound = [];
+        currentIndex = 0;
+        updateBossDisplay();
+        renderQuestion();
+    }
+}
+
+function openVictoryChest() {
+    const rewards = [
+        "免做一次家务卡 🧹 (金币+30)",
+        "自主玩游戏 20 分钟卡 🎮 (金币+20)",
+        "挑选小零食奖励卡 🍬 (金币+25)",
+        "休息 15 分钟自由卡 ☕ (金币+20)",
+        "暴击大金币包 💰 获得 50 金币！"
+    ];
+    const picked = rewards[Math.floor(Math.random() * rewards.length)];
+    addRewards(50, 30);
+    document.getElementById('chest-reward-box').innerHTML = '🎉 抽中契约卡片：<br><span style="color:#e11d48;font-size:18px;">' + picked + '</span>';
+    const btn = document.getElementById('open-chest-btn');
+    btn.innerText = '完成讨伐，返回营地';
+    btn.onclick = () => returnToHome();
+}
+
+function openMistakeBag() {
+    if (userData.mistakes.length === 0) {
+        return alert('🎒 你的错题本空空如也，太厉害了！');
+    }
+    const listHtml = userData.mistakes.map((m, idx) => `
+        <div style="text-align:left;padding:8px;border-bottom:1px solid #eee;font-size:12px;">
+            <strong style="color:var(--primary);">${idx+1}. ${m.word}</strong> (${m.meaning})<br>
+            <span style="color:#e11d48;">弱点：${m.trapRule}</span>
+        </div>
+    `).join('');
+
+    openModal(`
+        <h2 class="modal-title">🎒 错题猎人背包</h2>
+        <div style="max-height:260px;overflow-y:auto;margin:10px 0;">${listHtml}</div>
+        <button class="btn-large btn-correct" onclick="startMistakeChallenge()">⚔️ 针对错题集中复仇清剿</button>
+        <button class="action-voice-btn" style="width:100%;margin-top:8px;justify-content:center;" onclick="closeModal()">关闭</button>
+    `);
+}
+
+function startMistakeChallenge() {
+    closeModal();
+    curMode = 'words';
+    currentQueue = JSON.parse(JSON.stringify(userData.mistakes));
+    startLevel('mistakes', '🎒 错题复仇特训战');
+}
+
+function returnToHome() {
+    closeModal();
+    if (synth) synth.cancel();
+    document.getElementById('game-screen').style.display = 'none';
+    document.getElementById('home-screen').style.display = 'block';
+    updatePlayerBar();
+}
+
+function openModal(html) {
+    document.getElementById('modal-body-content').innerHTML = html;
+    document.getElementById('game-modal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('game-modal').style.display = 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadUserData();
+    renderUnitSelectionGrid();
+});
+</script>
+</body>
+</html>
