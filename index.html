@@ -443,49 +443,68 @@
             position: relative;
         }
         .hero-avatar-badge:active { transform: scale(0.95); }
-        .avatar-compact {
-            font-size: 16px;
-            display: flex;
-            align-items: center;
-            gap: 1px;
-            letter-spacing: -2px;
-        }
         .dress-tag {
             font-size: 10px;
             font-weight: 800;
             color: #4338ca;
             background: #e0e7ff;
-            padding: 1px 4px;
+            padding: 1px 5px;
             border-radius: 6px;
             margin-left: 4px;
         }
 
-        /* 试衣间舞台 */
+        /* 试衣间舞台与人物立绘 */
         .avatar-stage {
-            background: linear-gradient(135deg, #e0f2fe, #f0fdf4);
+            background: radial-gradient(circle at 50% 30%, #f0fdf4 0%, #e0f2fe 70%, #dbeafe 100%);
             border: 2px solid #bae6fd;
             border-radius: 16px;
-            padding: 16px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 12px;
+            position: relative;
+            min-height: 220px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .gender-btn {
+            border: 1px solid #cbd5e1;
+            background: rgba(255,255,255,0.85);
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #475569;
+            transition: all 0.2s;
+        }
+        .gender-btn.active {
+            background: #4f46e5;
+            color: white;
+            border-color: #4338ca;
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+        }
+        .char-stage-wrap {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 14px;
-            position: relative;
-            min-height: 120px;
+            margin: 4px 0 2px 0;
+            animation: heroBreathe 3s ease-in-out infinite alternate;
         }
-        .stage-main-char {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
+        @keyframes heroBreathe {
+            0% { transform: translateY(0px) scale(1); }
+            100% { transform: translateY(-3px) scale(1.01); }
         }
-        .stage-hat { font-size: 38px; margin-bottom: -10px; z-index: 2; transition: all 0.2s; }
-        .stage-body-wrap { display: flex; align-items: center; justify-content: center; position: relative; }
-        .stage-body { font-size: 46px; z-index: 1; }
-        .stage-wep { font-size: 34px; margin-left: -10px; z-index: 3; }
-        .stage-pet { font-size: 32px; position: absolute; left: 24px; bottom: 14px; animation: floatPet 2s ease-in-out infinite alternate; }
-
-        @keyframes floatPet { from { transform: translateY(0); } to { transform: translateY(-6px); } }
+        .char-title-tag {
+            font-size: 11px;
+            font-weight: 800;
+            color: #1e3a8a;
+            background: rgba(255,255,255,0.85);
+            padding: 3px 10px;
+            border-radius: 10px;
+            border: 1px solid #bfdbfe;
+        }
 
         /* 装扮分类Tab与物品网格 */
         .dress-cat-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
@@ -608,9 +627,8 @@
     <div class="player-bar">
         <div class="player-info" onclick="openLevelGuideModal()" style="cursor:pointer;" title="点击查看升级路线与成长秘籍">
             <div class="hero-avatar-badge" onclick="event.stopPropagation(); openDressingRoom();" title="点击进入英雄试衣间">
-                <div class="avatar-compact" id="avatar-compact-display">
-                    <span id="c-pet">🦉</span><span id="c-hat">🧢</span><span id="c-body">🥋</span><span id="c-wep">🗡️</span>
-                </div>
+                <div id="hero-mini-avatar" style="display:flex;align-items:center;"></div>
+                <span id="hero-pet-badge" style="font-size:16px;margin-left:2px;">🦉</span>
                 <span class="dress-tag">换装</span>
             </div>
             <div>
@@ -835,6 +853,7 @@ let userData = {
     coins: 20,
     level: 1,
     combo: 0,
+    gender: "girl",
     equipped: {
         hat: "hat_1",
         weapon: "wep_1",
@@ -854,6 +873,7 @@ function loadUserData() {
             userData = Object.assign(userData, parsed);
             if (!userData.ownedItems) userData.ownedItems = ["hat_1", "wep_1", "arm_1", "pet_1"];
             if (!userData.equipped) userData.equipped = { hat: "hat_1", weapon: "wep_1", armor: "arm_1", pet: "pet_1" };
+            if (!userData.gender) userData.gender = "girl";
             if (!userData.contractCards) userData.contractCards = [];
         }
     } catch(e){}
@@ -917,29 +937,372 @@ function updatePlayerBar() {
     }
     const misBadge = document.getElementById('mistake-badge');
     if (misBadge) misBadge.innerText = userData.mistakes.length;
+
+    updateAvatarDisplay();
 }
 
-// 同步更新人物立绘图标
+// 同步更新顶部英雄头像与宠物
 function updateAvatarDisplay() {
-    const getIcon = (type, id) => {
-        const item = ITEM_DATABASE[type].find(x => x.id === id);
-        return item ? item.icon : '';
-    };
+    const miniEl = document.getElementById('hero-mini-avatar');
+    if (miniEl) {
+        miniEl.innerHTML = getMiniAvatarSvg(userData.gender || 'girl', userData.equipped?.hat || 'hat_1');
+    }
+    const petEl = document.getElementById('hero-pet-badge');
+    if (petEl) {
+        const petItem = ITEM_DATABASE.pet.find(x => x.id === (userData.equipped?.pet || 'pet_1'));
+        petEl.innerText = petItem ? petItem.icon : '🦉';
+    }
+}
 
-    const petIcon = getIcon('pet', userData.equipped.pet);
-    const hatIcon = getIcon('hat', userData.equipped.hat);
-    const bodyIcon = getIcon('armor', userData.equipped.armor);
-    const wepIcon = getIcon('weapon', userData.equipped.weapon);
+// 头部迷你头像SVG
+function getMiniAvatarSvg(gender = 'girl', hat = 'hat_1') {
+    let hair = gender === 'girl'
+        ? `<ellipse cx="20" cy="20" rx="14" ry="14" fill="#58240c" />
+           <path d="M 6 18 C 3 24 3 28 6 30" stroke="#652b12" stroke-width="3" stroke-linecap="round" fill="none" />
+           <path d="M 34 18 C 37 24 37 28 34 30" stroke="#652b12" stroke-width="3" stroke-linecap="round" fill="none" />
+           <circle cx="6" cy="19" r="2" fill="#f43f5e" />
+           <circle cx="34" cy="19" r="2" fill="#f43f5e" />`
+        : `<ellipse cx="20" cy="20" rx="14" ry="14" fill="#3b1d09" />`;
 
-    const cPet = document.getElementById('c-pet');
-    const cHat = document.getElementById('c-hat');
-    const cBody = document.getElementById('c-body');
-    const cWep = document.getElementById('c-wep');
+    let miniHat = '';
+    if (hat === 'hat_1') {
+        miniHat = `<path d="M 10 14 C 10 7 30 7 30 14 Z" fill="#10b981" /><line x1="8" y1="14" x2="32" y2="14" stroke="#059669" stroke-width="2" />`;
+    } else if (hat === 'hat_2') {
+        miniHat = `<path d="M 9 15 C 9 6 31 6 31 15 Z" fill="#64748b" /><circle cx="20" cy="11" r="2" fill="#ef4444" />`;
+    } else if (hat === 'hat_3') {
+        miniHat = `<polygon points="20,2 10,13 30,13" fill="#4338ca" /><ellipse cx="20" cy="13" rx="13" ry="3" fill="#3730a3" />`;
+    } else if (hat === 'hat_4') {
+        miniHat = `<path d="M 11 12 L 13 6 L 17 9 L 20 5 L 23 9 L 27 6 L 29 12 Z" fill="#f59e0b" /><circle cx="20" cy="8" r="1.2" fill="#ef4444" />`;
+    }
 
-    if (cPet) cPet.innerText = petIcon;
-    if (cHat) cHat.innerText = hatIcon;
-    if (cBody) cBody.innerText = bodyIcon;
-    if (cWep) cWep.innerText = wepIcon;
+    return `
+    <svg viewBox="0 0 40 40" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+        ${hair}
+        <circle cx="20" cy="21" r="11" fill="#fed7aa" />
+        <ellipse cx="15" cy="23" rx="2" ry="1" fill="#fca5a5" />
+        <ellipse cx="25" cy="23" rx="2" ry="1" fill="#fca5a5" />
+        <circle cx="16" cy="20" r="1.5" fill="#0f172a" />
+        <circle cx="24" cy="20" r="1.5" fill="#0f172a" />
+        <path d="M 18 24 Q 20 26 22 24" stroke="#e11d48" stroke-width="1" fill="none" stroke-linecap="round" />
+        <path d="M 11 17 C 13 13 27 13 29 17 C 27 18 24 17 20 18 C 16 17 13 18 11 17 Z" fill="#78350f" />
+        ${miniHat}
+    </svg>
+    `;
+}
+
+// 全身动态矢量角色立绘SVG生成器 (支持女孩/男孩、4阶帽子、4阶铠甲、4阶武器、4阶萌宠)
+function getCharacterSvg(gender = 'girl', hat = 'hat_1', weapon = 'wep_1', armor = 'arm_1', pet = 'pet_1') {
+    let hairBack = '';
+    let hairFront = '';
+    let ears = `
+        <circle cx="52" cy="74" r="5" fill="#fed7aa" />
+        <circle cx="108" cy="74" r="5" fill="#fed7aa" />
+    `;
+
+    if (gender === 'girl') {
+        hairBack = `
+            <!-- 女孩背发 -->
+            <ellipse cx="80" cy="74" rx="30" ry="28" fill="#58240c" />
+            <!-- 女孩双马尾 -->
+            <path d="M 48 70 C 26 82 24 116 38 126 C 46 112 48 88 56 75 Z" fill="#652b12" />
+            <path d="M 112 70 C 134 82 136 116 122 126 C 114 112 112 88 104 75 Z" fill="#652b12" />
+            <!-- 红色蝴蝶结发带 -->
+            <circle cx="48" cy="74" r="5.5" fill="#f43f5e" />
+            <circle cx="48" cy="74" r="2.5" fill="#ffe4e6" />
+            <circle cx="112" cy="74" r="5.5" fill="#f43f5e" />
+            <circle cx="112" cy="74" r="2.5" fill="#ffe4e6" />
+        `;
+        hairFront = `
+            <!-- 女孩碎齐刘海 -->
+            <path d="M 52 64 C 58 46 102 46 108 64 C 104 70 94 65 80 69 C 66 65 56 70 52 64 Z" fill="#78350f" />
+            <path d="M 68 58 Q 75 70 82 58" fill="#78350f" />
+        `;
+    } else {
+        hairBack = `
+            <!-- 男孩帅气短发底色 -->
+            <ellipse cx="80" cy="74" rx="31" ry="28" fill="#3b1d09" />
+            <!-- 鬓角 -->
+            <path d="M 48 65 C 44 40 116 40 112 65 C 120 78 114 90 108 85 C 108 65 52 65 52 85 C 46 90 40 78 48 65 Z" fill="#451a03" />
+        `;
+        hairFront = `
+            <!-- 男孩碎发刘海 -->
+            <path d="M 48 58 C 55 42 105 42 112 58 C 105 66 95 60 80 67 C 65 60 55 66 48 58 Z" fill="#592207" />
+        `;
+    }
+
+    // 战铠 / 服装
+    let armorSvg = '';
+    if (armor === 'arm_1') { // 活力布衣/学院装
+        armorSvg = `
+            <!-- 活力学院装 / 结实布衣 -->
+            <path d="M 64 105 L 96 105 L 102 142 L 58 142 Z" fill="#3b82f6" />
+            <path d="M 72 105 L 80 118 L 88 105 Z" fill="#ffffff" />
+            <polygon points="76,110 84,110 80,116" fill="#ef4444" />
+            <polygon points="80,116 75,124 85,124" fill="#ef4444" />
+            <rect x="60" y="132" width="40" height="4" fill="#1e3a8a" />
+            <path d="M 58 136 L 102 136 L 106 153 L 54 153 Z" fill="#1d4ed8" />
+        `;
+    } else if (armor === 'arm_2') { // 骑士重铠
+        armorSvg = `
+            <!-- 白银骑士重铠 -->
+            <path d="M 62 104 L 98 104 L 104 144 L 56 144 Z" fill="#94a3b8" />
+            <path d="M 64 105 L 96 105 L 100 138 L 60 138 Z" fill="#cbd5e1" />
+            <ellipse cx="58" cy="108" rx="8" ry="6" fill="#64748b" />
+            <ellipse cx="102" cy="108" rx="8" ry="6" fill="#64748b" />
+            <rect x="78" y="112" width="4" height="18" fill="#f59e0b" />
+            <rect x="71" y="118" width="18" height="4" fill="#f59e0b" />
+            <rect x="58" y="138" width="44" height="5" fill="#475569" />
+            <path d="M 56 143 L 104 143 L 108 156 L 52 156 Z" fill="#64748b" />
+        `;
+    } else if (armor === 'arm_3') { // 星空法袍
+        armorSvg = `
+            <!-- 星空长袍 -->
+            <path d="M 62 104 L 98 104 L 108 162 L 52 162 Z" fill="#312e81" />
+            <path d="M 66 105 L 94 105 L 102 160 L 58 160 Z" fill="#4338ca" />
+            <path d="M 80 105 L 80 160" stroke="#facc15" stroke-width="2" />
+            <circle cx="72" cy="130" r="2" fill="#fef08a" />
+            <circle cx="88" cy="142" r="2" fill="#fef08a" />
+            <circle cx="70" cy="150" r="1.5" fill="#fef08a" />
+            <circle cx="90" cy="122" r="1.5" fill="#fef08a" />
+        `;
+    } else if (armor === 'arm_4') { // 烈焰斗篷与红皇室礼裙
+        armorSvg = `
+            <!-- 烈焰披风(后衬) -->
+            <path d="M 54 106 L 38 166 L 122 166 L 106 106 Z" fill="#dc2626" opacity="0.95" />
+            <!-- 华丽礼裙 -->
+            <path d="M 64 105 L 96 105 L 104 158 L 56 158 Z" fill="#e11d48" />
+            <path d="M 68 105 L 92 105 L 98 156 L 62 156 Z" fill="#fb7185" />
+            <path d="M 72 105 L 80 120 L 88 105 Z" fill="#fef08a" />
+            <circle cx="80" cy="118" r="3" fill="#be123c" />
+            <rect x="60" y="134" width="40" height="5" fill="#be123c" />
+        `;
+    }
+
+    // 帽子 / 头饰
+    let hatSvg = '';
+    if (hat === 'hat_1') { // 猎人便帽
+        hatSvg = `
+            <!-- 猎人运动软帽 -->
+            <path d="M 48 52 C 48 28 112 28 112 52 Z" fill="#10b981" />
+            <path d="M 42 52 L 120 52 C 122 56 110 58 80 58 C 50 58 38 56 42 52 Z" fill="#059669" />
+            <path d="M 88 40 Q 98 26 104 22 Q 98 34 88 42 Z" fill="#facc15" />
+            <circle cx="80" cy="38" r="3.5" fill="#34d399" />
+        `;
+    } else if (hat === 'hat_2') { // 钢铁战盔
+        hatSvg = `
+            <!-- 钢铁战盔 -->
+            <path d="M 44 54 C 44 24 116 24 116 54 Z" fill="#64748b" />
+            <path d="M 48 52 C 48 28 112 28 112 52 Z" fill="#94a3b8" />
+            <polygon points="80,32 86,40 80,48 74,40" fill="#ef4444" />
+            <rect x="78" y="20" width="4" height="12" fill="#f59e0b" />
+            <circle cx="80" cy="18" r="5" fill="#ef4444" />
+        `;
+    } else if (hat === 'hat_3') { // 贤者斗笠
+        hatSvg = `
+            <!-- 魔法师巫师尖顶帽 -->
+            <polygon points="80,8 50,48 110,48" fill="#4338ca" />
+            <ellipse cx="80" cy="49" rx="36" ry="7" fill="#3730a3" />
+            <ellipse cx="80" cy="44" rx="20" ry="3" fill="#f59e0b" />
+            <polygon points="80,26 82,30 86,30 83,33 84,37 80,34 76,37 77,33 74,30 78,30" fill="#fef08a" />
+        `;
+    } else if (hat === 'hat_4') { // 璀璨王冠
+        hatSvg = `
+            <!-- 璀璨黄金王冠 -->
+            <path d="M 52 46 L 56 28 L 68 36 L 80 22 L 92 36 L 104 28 L 108 46 Z" fill="#f59e0b" stroke="#d97706" stroke-width="1.5" />
+            <circle cx="80" cy="26" r="3.5" fill="#ef4444" />
+            <circle cx="68" cy="38" r="2.5" fill="#0284c7" />
+            <circle cx="92" cy="38" r="2.5" fill="#10b981" />
+            <circle cx="58" cy="34" r="2" fill="#ec4899" />
+            <circle cx="102" cy="34" r="2" fill="#ec4899" />
+        `;
+    }
+
+    // 武器 (右手持握)
+    let weaponSvg = '';
+    if (weapon === 'wep_1') { // 初学铁剑
+        weaponSvg = `
+            <!-- 初学铁剑 -->
+            <g transform="translate(108, 95) rotate(25)">
+                <rect x="-3" y="-35" width="6" height="35" fill="#cbd5e1" stroke="#64748b" stroke-width="1" />
+                <polygon points="0,-42 -4,-35 4,-35" fill="#94a3b8" />
+                <rect x="-8" y="0" width="16" height="4" rx="2" fill="#f59e0b" />
+                <rect x="-2.5" y="4" width="5" height="12" rx="1" fill="#78350f" />
+                <circle cx="0" cy="17" r="3" fill="#f59e0b" />
+            </g>
+        `;
+    } else if (weapon === 'wep_2') { // 双持圣刃
+        weaponSvg = `
+            <!-- 圣光双刃 -->
+            <g transform="translate(112, 95) rotate(20)">
+                <path d="M -4 -42 L 0 -52 L 4 -42 L 3 0 L -3 0 Z" fill="#67e8f9" stroke="#0891b2" stroke-width="1" />
+                <rect x="-10" y="0" width="20" height="5" rx="2" fill="#f59e0b" />
+                <rect x="-2.5" y="5" width="5" height="13" fill="#1e293b" />
+                <circle cx="0" cy="19" r="3.5" fill="#06b6d4" />
+            </g>
+        `;
+    } else if (weapon === 'wep_3') { // 智慧法杖
+        weaponSvg = `
+            <!-- 星月智慧法杖 -->
+            <g transform="translate(112, 92) rotate(15)">
+                <rect x="-2.5" y="-30" width="5" height="65" rx="2" fill="#b45309" />
+                <path d="M 0 -45 C -15 -45 -15 -25 0 -25 C -8 -28 -8 -42 0 -45 Z" fill="#f59e0b" />
+                <circle cx="-6" cy="-35" r="5.5" fill="#a855f7" />
+                <circle cx="-6" cy="-35" r="2.5" fill="#f3e8ff" />
+            </g>
+        `;
+    } else if (weapon === 'wep_4') { // 神木长弓
+        weaponSvg = `
+            <!-- 神木长弓 -->
+            <g transform="translate(110, 95) rotate(10)">
+                <path d="M -5 -40 Q 15 -10 -5 25" stroke="#78350f" stroke-width="4" fill="none" stroke-linecap="round" />
+                <line x1="-5" y1="-40" x2="-5" y2="25" stroke="#38bdf8" stroke-width="1.5" />
+                <line x1="-15" y1="-8" x2="15" y2="-8" stroke="#facc15" stroke-width="2" />
+                <polygon points="18,-8 13,-11 13,-5" fill="#facc15" />
+            </g>
+        `;
+    }
+
+    // 萌宠伙伴
+    let petSvg = '';
+    if (pet === 'pet_1') { // 聪慧猫头鹰
+        petSvg = `
+            <g transform="translate(18, 125)">
+                <path d="M -5 32 Q 15 30 35 33" stroke="#78350f" stroke-width="3" stroke-linecap="round" />
+                <ellipse cx="15" cy="16" rx="13" ry="15" fill="#854d0e" />
+                <ellipse cx="15" cy="18" rx="9" ry="11" fill="#fef3c7" />
+                <ellipse cx="4" cy="16" rx="3" ry="8" fill="#713f12" />
+                <ellipse cx="26" cy="16" rx="3" ry="8" fill="#713f12" />
+                <circle cx="10" cy="10" r="5" fill="#ffffff" stroke="#713f12" stroke-width="1" />
+                <circle cx="10" cy="10" r="2.5" fill="#0f172a" />
+                <circle cx="20" cy="10" r="5" fill="#ffffff" stroke="#713f12" stroke-width="1" />
+                <circle cx="20" cy="10" r="2.5" fill="#0f172a" />
+                <polygon points="15,0 4,4 15,8 26,4" fill="#1e1b4b" />
+                <line x1="26" y1="4" x2="28" y2="10" stroke="#f59e0b" stroke-width="1.5" />
+                <polygon points="15,13 13,16 17,16" fill="#ea580c" />
+            </g>
+        `;
+    } else if (pet === 'pet_2') { // 忠诚柴犬
+        petSvg = `
+            <g transform="translate(16, 138)">
+                <ellipse cx="16" cy="16" rx="14" ry="11" fill="#d97706" />
+                <circle cx="25" cy="10" r="9" fill="#d97706" />
+                <circle cx="24" cy="12" r="5" fill="#fef3c7" />
+                <polygon points="21,3 18,9 24,8" fill="#b45309" />
+                <polygon points="29,3 26,9 32,8" fill="#b45309" />
+                <circle cx="23" cy="9" r="1.5" fill="#0f172a" />
+                <circle cx="28" cy="9" r="1.5" fill="#0f172a" />
+                <circle cx="26" cy="12" r="1.5" fill="#0f172a" />
+                <ellipse cx="20" cy="11" rx="2" ry="1" fill="#f87171" />
+                <path d="M 4 14 Q 0 8 4 4" stroke="#d97706" stroke-width="3.5" fill="none" stroke-linecap="round" />
+            </g>
+        `;
+    } else if (pet === 'pet_3') { // 招财橘猫
+        petSvg = `
+            <g transform="translate(18, 136)">
+                <ellipse cx="15" cy="16" rx="13" ry="12" fill="#ea580c" />
+                <circle cx="15" cy="9" r="9" fill="#ea580c" />
+                <ellipse cx="15" cy="12" rx="6" ry="4" fill="#ffedd5" />
+                <polygon points="8,1 6,8 12,6" fill="#c2410c" />
+                <polygon points="22,1 18,6 24,8" fill="#c2410c" />
+                <ellipse cx="12" cy="8" rx="1.5" ry="2" fill="#15803d" />
+                <ellipse cx="18" cy="8" rx="1.5" ry="2" fill="#15803d" />
+                <polygon points="15,11 14,12 16,12" fill="#f43f5e" />
+                <ellipse cx="8" cy="15" rx="3" ry="4" fill="#ffedd5" />
+                <circle cx="15" cy="16" r="3" fill="#facc15" />
+            </g>
+        `;
+    } else if (pet === 'pet_4') { // 幼年小火龙
+        petSvg = `
+            <g transform="translate(14, 126)">
+                <path d="M 12 12 C 4 0 0 10 10 18 Z" fill="#dc2626" />
+                <ellipse cx="18" cy="18" rx="11" ry="13" fill="#ea580c" />
+                <ellipse cx="19" cy="20" rx="7" ry="9" fill="#fef08a" />
+                <circle cx="20" cy="10" r="9" fill="#ea580c" />
+                <polygon points="18,3 15,-2 13,4" fill="#b45309" />
+                <polygon points="24,3 27,-2 25,4" fill="#b45309" />
+                <circle cx="21" cy="9" r="3" fill="#facc15" />
+                <circle cx="21" cy="9" r="1.5" fill="#0f172a" />
+                <path d="M 9 24 Q 2 26 4 32" stroke="#ea580c" stroke-width="3" fill="none" stroke-linecap="round" />
+                <circle cx="5" cy="34" r="3" fill="#ef4444" />
+                <circle cx="5" cy="34" r="1.5" fill="#fef08a" />
+            </g>
+        `;
+    }
+
+    return `
+    <svg viewBox="0 0 160 200" width="160" height="200" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 6px 12px rgba(0,0,0,0.12));">
+        <!-- 阴影 -->
+        <ellipse cx="80" cy="186" rx="36" ry="7" fill="rgba(15,23,42,0.14)" />
+
+        <!-- 萌宠伙伴 -->
+        ${petSvg}
+
+        <!-- 英雄角色主体 -->
+        <g id="hero-character-group">
+            <!-- 小短靴与腿部 -->
+            <path d="M 70 148 L 70 178 L 64 182" stroke="#334155" stroke-width="6" stroke-linecap="round" fill="none" />
+            <path d="M 90 148 L 90 178 L 96 182" stroke="#334155" stroke-width="6" stroke-linecap="round" fill="none" />
+            <rect x="62" y="174" width="10" height="9" rx="2" fill="#0f172a" />
+            <rect x="88" y="174" width="10" height="9" rx="2" fill="#0f172a" />
+
+            <!-- 头发后侧 -->
+            ${hairBack}
+
+            <!-- 颈部 -->
+            <rect x="75" y="94" width="10" height="12" rx="3" fill="#fed7aa" />
+
+            <!-- 服装战铠 -->
+            ${armorSvg}
+
+            <!-- 左手臂 -->
+            <path d="M 64 108 Q 48 120 52 135" stroke="#fed7aa" stroke-width="5.5" stroke-linecap="round" fill="none" />
+            <circle cx="52" cy="135" r="3.5" fill="#fed7aa" />
+
+            <!-- 头部脸颊 -->
+            ${ears}
+            <ellipse cx="80" cy="74" rx="28" ry="26" fill="#fed7aa" />
+            <ellipse cx="80" cy="74" rx="28" ry="26" fill="#fff7ed" opacity="0.35" />
+
+            <!-- 萌萌腮红 -->
+            <ellipse cx="64" cy="80" rx="5.5" ry="3.5" fill="#fca5a5" opacity="0.7" />
+            <ellipse cx="96" cy="80" rx="5.5" ry="3.5" fill="#fca5a5" opacity="0.7" />
+
+            <!-- 水灵大眼睛 -->
+            <g class="hero-eyes">
+                <ellipse cx="67" cy="73" rx="4.5" ry="5.5" fill="#0f172a" />
+                <circle cx="69" cy="71" r="1.8" fill="#ffffff" />
+                <circle cx="66" cy="75" r="0.9" fill="#ffffff" />
+
+                <ellipse cx="93" cy="73" rx="4.5" ry="5.5" fill="#0f172a" />
+                <circle cx="95" cy="71" r="1.8" fill="#ffffff" />
+                <circle cx="92" cy="75" r="0.9" fill="#ffffff" />
+            </g>
+
+            <!-- 甜美微笑 -->
+            <path d="M 75 83 Q 80 88 85 83" stroke="#e11d48" stroke-width="2" fill="none" stroke-linecap="round" />
+
+            <!-- 前刘海 -->
+            ${hairFront}
+
+            <!-- 帽子头饰 -->
+            ${hatSvg}
+
+            <!-- 右手臂持武器 -->
+            <path d="M 96 108 Q 110 115 108 126" stroke="#fed7aa" stroke-width="5.5" stroke-linecap="round" fill="none" />
+            <circle cx="108" cy="126" r="3.5" fill="#fed7aa" />
+
+            <!-- 武器 -->
+            ${weaponSvg}
+        </g>
+    </svg>
+    `;
+}
+
+function setHeroGender(gender) {
+    userData.gender = gender;
+    saveUserData();
+    updatePlayerBar();
+    renderDressingRoom();
 }
 
 /* ==================== 升级指引成长树 ==================== */
@@ -1033,16 +1396,6 @@ function setDressingTab(tab) {
 }
 
 function renderDressingRoom() {
-    const getIcon = (type, id) => {
-        const item = ITEM_DATABASE[type].find(x => x.id === id);
-        return item ? item.icon : '';
-    };
-
-    const petIcon = getIcon('pet', userData.equipped.pet);
-    const hatIcon = getIcon('hat', userData.equipped.hat);
-    const bodyIcon = getIcon('armor', userData.equipped.armor);
-    const wepIcon = getIcon('weapon', userData.equipped.weapon);
-
     const items = ITEM_DATABASE[currentDressingTab];
     const itemsHtml = items.map(item => {
         const isEquipped = userData.equipped[currentDressingTab] === item.id;
@@ -1067,21 +1420,31 @@ function renderDressingRoom() {
         `;
     }).join('');
 
+    const curArmorName = ITEM_DATABASE.armor.find(x => x.id === userData.equipped.armor)?.name || '';
+    const curWepName = ITEM_DATABASE.weapon.find(x => x.id === userData.equipped.weapon)?.name || '';
+
     openModal(`
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
             <h2 class="modal-title" style="margin:0;color:#4338ca;">🪞 英雄试衣间</h2>
             <div style="font-size:13px;font-weight:800;color:#b45309;background:#fef3c7;padding:3px 10px;border-radius:12px;">🪙 拥有金币: ${userData.coins}</div>
         </div>
 
-        <!-- 试衣间立绘大舞台 -->
+        <!-- 试衣间人物立绘大舞台 -->
         <div class="avatar-stage">
-            <div class="stage-pet" id="stage-pet">${petIcon}</div>
-            <div class="stage-main-char">
-                <div class="stage-hat" id="stage-hat">${hatIcon}</div>
-                <div class="stage-body-wrap">
-                    <div class="stage-body" id="stage-body">${bodyIcon}</div>
-                    <div class="stage-wep" id="stage-wep">${wepIcon}</div>
+            <div style="width:100%;display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                <div style="display:flex;gap:6px;">
+                    <button class="gender-btn ${(userData.gender||'girl')==='girl'?'active':''}" onclick="setHeroGender('girl')">👧 灵动小女侠</button>
+                    <button class="gender-btn ${userData.gender==='boy'?'active':''}" onclick="setHeroGender('boy')">👦 阳光小剑客</button>
                 </div>
+                <div style="font-size:11px;font-weight:800;color:#0369a1;background:#e0f2fe;padding:2px 8px;border-radius:10px;">✨ 实时全身立绘</div>
+            </div>
+
+            <div class="char-stage-wrap" id="char-stage-svg">
+                ${getCharacterSvg(userData.gender || 'girl', userData.equipped.hat, userData.equipped.weapon, userData.equipped.armor, userData.equipped.pet)}
+            </div>
+
+            <div class="char-title-tag">
+                ${userData.gender === 'boy' ? '👦 阳光小剑客' : '👧 灵动小女侠'} · ${curArmorName} + ${curWepName}
             </div>
         </div>
 
@@ -1103,7 +1466,7 @@ function renderDressingRoom() {
 function equipItem(type, itemId) {
     userData.equipped[type] = itemId;
     saveUserData();
-    updateAvatarDisplay();
+    updatePlayerBar();
     renderDressingRoom();
 }
 
